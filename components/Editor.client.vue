@@ -7,7 +7,8 @@ import EditorJS from "@editorjs/editorjs";
 
 const editor = ref(null),
   editorEl = ref(null),
-  data = defineModel();
+  data = defineModel(),
+  emit = defineEmits(['change'])
 
 onMounted(async () => {
   await nextTick();
@@ -17,8 +18,8 @@ onMounted(async () => {
     autofocus: true,
     placeholder: "Введите текст",
     onChange: async (api, event) => {
+      emit('change', event)
       await api.saver.save().then((res) => {
-        console.log(res);
         data.value = res.blocks;
       });
     },
@@ -34,9 +35,8 @@ onUnmounted(() => {
 
 <style lang="scss">
 .editor {
-  min-width: 150px;
-  width: 100%;
-  height: 100%;
+  min-width: max-content;
+  min-height: max-content;
 
   .codex-editor__redactor {
     margin-right: 0;
