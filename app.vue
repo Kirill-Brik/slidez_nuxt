@@ -1,0 +1,17 @@
+<template>
+  <div class="page">
+    <NuxtPage />
+  </div>
+</template>
+
+<style lang="scss">
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  &__content {
+    flex: 1 0 auto;
+  }
+}
+</style>
