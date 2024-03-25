@@ -9,35 +9,41 @@
           <template v-if="block.content.length > 0">
             <ul>
               <li v-for="content in block.content" :key="content.id">
-              {{ content.data.text }}
+                {{ content.data.text }}
               </li>
             </ul>
           </template>
-          <template v-else>
-            Text
-          </template>
+          <template v-else> Text </template>
         </li>
       </ul>
-      <button type="button" @click="addContent">Добавить контент</button>
+      <button type="button" @click="redactor.addBlock(revealState.indexh)">Добавить контент</button>
     </div>
-    <Reveal class="redactor__reveal" v-model="revealState" :slides="slides">
+    <Reveal
+      class="redactor__reveal"
+      v-model="revealState"
+      :slides="redactor.list"
+    >
       <SlideRedactor
-        v-for="(slide, index) in slides"
+        v-for="(slide, index) in redactor.list"
         :key="slide"
-        v-model:slide="slides[index].slide"
-        v-model:blocks="slides[index].blocks"
+        v-model:settings="redactor.list[index].settings"
+        v-model:blocks="redactor.list[index].blocks"
         class="redactor__slide"
       >
       </SlideRedactor>
     </Reveal>
-    <button class="redactor__add-slide" type="button" @click="addSlide">
+    <button
+      class="redactor__add-slide"
+      type="button"
+      @click="redactor.addSlide(revealState.indexh + 1)"
+    >
       Добавить слайд
     </button>
     <button
       class="redactor__remove-slide"
       type="button"
-      @click="removeSlide"
-      :disabled="slides.length === 1"
+      @click="redactor.removeSlide(revealState.indexh)"
+      :disabled="redactor.list.length === 1"
     >
       Удалить слайд
     </button>
@@ -48,34 +54,16 @@
 </template>
 
 <script setup>
-const defaultSlide = () => ({ slide: { background: "white" }, blocks: [] }),
-  defaultBlock = (index) => ({
-    content: []
-  });
-const slides = ref([defaultSlide()]),
+const redactor = useRedactor(),
   revealState = ref({ indexh: 0, indexv: 0 }),
-  activeSlide = ref(slides.value[0]);
+  activeSlide = ref(redactor.list[0]);
 watch(
   revealState,
   (value) => {
-    activeSlide.value = slides.value[value.indexh];
+    activeSlide.value = redactor.list[value.indexh];
   },
   { deep: true }
 );
-
-function addSlide() {
-  slides.value.splice(revealState.value.indexh + 1, 0, defaultSlide());
-}
-
-function removeSlide() {
-  slides.value.splice(revealState.value.indexh, 1);
-}
-
-function addContent() {
-  slides.value[revealState.value.indexh].blocks.push({
-    ...defaultBlock(slides.value[revealState.value.indexh].blocks.length),
-  });
-}
 </script>
 
 <style lang="scss">

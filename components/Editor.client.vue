@@ -23,9 +23,9 @@ onMounted(async () => {
         data.value = res.blocks;
       });
     },
-  });
-  editor.value.isReady.then(() => {
-    console.log(editor.value);
+    onReady: async (event) => {
+      emit('change', event)
+    }
   });
 });
 onUnmounted(() => {
@@ -35,8 +35,16 @@ onUnmounted(() => {
 
 <style lang="scss">
 .editor {
+  position: relative;
   min-width: max-content;
   min-height: max-content;
+  z-index: 1;
+
+  background-color: red;
+
+  &:hover {
+    border: 1px solid yellow;
+  }
 
   .codex-editor__redactor {
     margin-right: 0;

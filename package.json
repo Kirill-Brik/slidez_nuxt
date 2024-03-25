@@ -11,12 +11,15 @@
   },
   "dependencies": {
     "@editorjs/editorjs": "^2.29.0",
+    "@pinia/nuxt": "^0.5.1",
     "interactjs": "^1.10.26",
     "lodash": "^4.17.21",
     "nuxt": "^3.11.1",
+    "pinia": "^2.1.7",
     "reveal.js": "^5.0.5",
     "sass": "^1.72.0",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "vue3-moveable": "^0.28.0"
   }
 }

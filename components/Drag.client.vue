@@ -1,82 +1,121 @@
 <template>
-  <div ref="dragEl" class="drag">
-    <div ref="contentEl" class="drag__content">
+  <div class="move" ref="moveEl" v-bind="$attrs">
+    <div ref="contentEl" class="move__content" @mousedown="selectContent">
       <slot></slot>
     </div>
   </div>
+  <Moveable
+    class="test"
+    ref="moveRef"
+    v-bind="interactOptions"
+    @drag="onDrag"
+    @drag-end="onDragEnd"
+    @resize="onResize"
+    @resize-end="onResizeEnd"
+    @click="select"
+  />
 </template>
 
 <script setup>
-import interact from "interactjs";
+// import interact from "interactjs";
+import Moveable from "vue3-moveable";
 
-const interactState = ref(null),
-  dragEl = ref(null),
+const interactOptions = ref({
+    target: null,
+    draggable: true,
+    throttleDrag: 1,
+    startDragRotate: 0,
+    throttleDragRotate: 0,
+    resizable: true,
+    throttleResize: 1,
+  }),
+  moveRef = ref(null),
+  moveEl = ref(null),
   contentEl = ref(null),
   style = ref({
     top: 0,
     left: 0,
-    width: "",
-    height: "",
-  }),
-  dragOptions = ref({
-    cursorChecker() {
-      return null;
-    },
-    listeners: {
-      move(event) {
-        style.value.top += event.dy;
-        style.value.left += event.dx;
-      },
-    },
-  }),
-  resizeOptions = ref({
-    edges: { top: true, left: true, bottom: true, right: true },
-    listeners: {
-      move(event) {
-        const contentRect = contentEl.value.getBoundingClientRect()
-        style.value.width = event.rect.width;
-        style.value.height = event.rect.height > contentRect.height ?  event.rect.height : contentRect.height;
-        style.value.top += event.deltaRect.top;
-        style.value.left += event.deltaRect.left;
-      },
-    },
+    width: 0,
+    height: 0,
   });
 
-function update() {
-  const contentRect = contentEl.value.getBoundingClientRect()
-  style.value.width = style.value.width > contentRect.width ?  style.value.width : contentRect.width;
-  style.value.height = style.value.height > contentRect.height ?  style.value.height : contentRect.height;
+defineOptions({
+  inheritAttrs: false,
+});
+
+function dragEvent() {
+  console.log("drag");
 }
+
+function select(event) {
+  console.log("click", event.target);
+}
+
+function selectContent(event) {
+  console.log("content");
+  interactOptions.value.draggable = !interactOptions.value.draggable;
+}
+
+function onDrag(event) {
+  event.target.style.top = `${style.value.top + event.dist[1]}px`;
+  event.target.style.left = `${style.value.left + event.dist[0]}px`;
+}
+
+function onDragEnd(event) {
+  if (event.lastEvent) {
+    style.value.top += event.lastEvent.dist[1];
+    style.value.left += event.lastEvent.dist[0];
+  }
+}
+function onResize(event) {
+  event.target.style.width = `${event.width}px`;
+  event.target.style.height = `${event.height}px`;
+  event.target.style.top = `${style.value.top + event.drag.dist[1]}px`;
+  event.target.style.left = `${style.value.left + event.drag.dist[0]}px`;
+}
+
+function onResizeEnd(event) {
+  if (event.lastEvent) {
+    style.value.width = event.lastEvent.width;
+    style.value.height = event.lastEvent.height;
+    style.value.top += event.lastEvent.drag.dist[1];
+    style.value.left += event.lastEvent.drag.dist[0];
+  }
+  ``;
+}
+function update() {
+  const contentRect = contentEl.value.getBoundingClientRect();
+  if (style.value.width < contentRect.width) {
+    moveEl.value.style.width = `${contentEl.width}px`;
+    style.value.width = contentRect.height;
+  } else if (style.value.height < contentRect.height) {
+    moveEl.value.style.height = `${contentEl.height}px`;
+    style.value.height = contentRect.height;
+  }
+  moveRef.value.updateRect();
+}
+
+defineExpose({
+  update,
+});
 
 onMounted(async () => {
   await nextTick();
-  interactState.value = interact(dragEl.value)
-    .draggable(dragOptions.value)
-    .resizable(resizeOptions.value);
+  interactOptions.value.target = moveEl.value;
+  update();
 });
-
-
-onUnmounted(() => {
-  interactState.value.unset()
-})
-
-defineExpose({
-  update
-})
 </script>
 
 <style lang="scss" scoped>
-.drag {
+.test {
+  pointer-events: none;
+}
+.move {
   position: absolute;
-  top: calc(50% + (v-bind("style.top") * 1px));
-  left: calc(50% + (v-bind("style.left") * 1px));
-  width: calc(v-bind("style.width") * 1px);
-  height: calc(v-bind("style.height") * 1px);
-  min-width: max-content;
   min-height: max-content;
+  min-width: max-content;
   background-color: aquamarine;
-  touch-action: none;
-  border: 1px dashed blue;
+  // border: 1px dashed blue;
 
   &__content {
     min-height: max-content;

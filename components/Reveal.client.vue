@@ -28,12 +28,12 @@ onMounted(async () => {
     disableLayout: true,
     // plugins: [Markdown],
   });
-  await reveal.value.initialize();
   revealState.value = { indexh: 0, indexv: 0 };
   reveal.value.on("slidechanged", (event) => {
     revealState.value.indexh = event.indexh;
     revealState.value.indexv = event.indexv;
   });
+  reveal.value.initialize();
 });
 
 watch(slidesLenght, async (value, oldValue) => {
