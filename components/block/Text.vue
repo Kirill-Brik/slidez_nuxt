@@ -35,7 +35,8 @@ const model = defineModel({ default: {} }),
   move = ref(null),
   content = ref(null),
   isFocus = ref(true),
-  isEdit = ref(false);
+  isEdit = ref(false),
+  emit = defineEmits(["focus", "blur"]);
 
 function initMove() {
   document.addEventListener("mousedown", outsideEvent);
@@ -54,6 +55,7 @@ function focus() {
       moveOptions.value.resizable =
         true;
     document.addEventListener("mousedown", outsideEvent);
+    emit("focus", model.value);
   }
 }
 
@@ -70,6 +72,7 @@ function outsideEvent(event) {
 
     console.log("outside");
     document.removeEventListener("mousedown", outsideEvent);
+    emit("blur");
   }
 }
 
@@ -80,4 +83,8 @@ async function toggleFocus() {
   await nextTick();
   content.value.el.focus();
 }
+
+onMounted(() => {
+  emit("focus", model.value);
+});
 </script>

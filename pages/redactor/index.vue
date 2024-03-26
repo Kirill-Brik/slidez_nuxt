@@ -33,7 +33,7 @@
         </SlideRedactor>
       </Reveal>
     </div>
-    <div class="redactor__content-editor"></div>
+    <EditBlock class="redactor__content-editor" />
     <div class="redactor__reveal-actions">
       <button
         class="redactor__add-slide"

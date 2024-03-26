@@ -69,7 +69,7 @@ const interactOptions = ref({
     },
     ...model.value,
   }),
-  emit = defineEmits(['init',"update", "dblclick", "click"]);
+  emit = defineEmits(["init", "update", "dblclick", "click"]);
 
 watch(
   style,
@@ -117,6 +117,9 @@ function onResizeEnd(event) {
 }
 function update() {
   const contentRect = contentEl.value.getBoundingClientRect();
+  if (style.value.width < contentRect.width) {
+    style.value.width = contentRect.width;
+  }
   if (style.value.height < contentRect.height) {
     moveEl.value.style.height = `${contentRect.height}px`;
     style.value.height = contentRect.height;
@@ -129,7 +132,7 @@ onMounted(async () => {
   await nextTick();
   interactOptions.value.target = moveEl.value;
   update();
-  emit('init')
+  emit("init");
 });
 
 defineExpose({
