@@ -1,28 +1,18 @@
 <template>
-  <section class="slide" :data-background-color="settings.background">
-    <Drag ref="drag" v-for="(block, index) in blocks" class="slide__drag">
-      <Editor v-model="block.content" class="slide__editor" @change="updateDrag(index)" />
-    </Drag>
+  <section ref="slideEl" class="slide" :data-background-color="settings.background">
+    <TextBlock v-model="blocks[index]" :move-options="moveOptions" v-for="(block, index) in blocks" />
   </section>
 </template>
 
 <script setup>
 const settings = defineModel("settings"),
   blocks = defineModel("blocks"),
-  drag= ref([])
-
-function updateDrag(index) {
-  console.log(drag.value[index])
-  drag.value[index].update()
-}
+  slideEl = ref(null),
+  moveOptions = ref({dragContainer: slideEl})
 </script>
 
 <style lang="scss" scoped>
 .slide {
   position: relative;
-
-  &__editor {
-    // width: 100%;
-  }
 }
 </style>

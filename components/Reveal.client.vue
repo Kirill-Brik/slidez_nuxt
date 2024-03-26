@@ -37,7 +37,6 @@ onMounted(async () => {
 });
 
 watch(slidesLenght, async (value, oldValue) => {
-  console.log(value, oldValue);
   await nextTick();
   reveal.value.sync();
   if (value > oldValue) reveal.value.next();
