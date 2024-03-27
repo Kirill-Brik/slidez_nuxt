@@ -13,7 +13,7 @@
           <template v-else> Text </template>
         </li>
       </ul>
-      <button type="button" @click="redactor.addBlock(revealState.indexh)">
+      <button type="button" @click="redactorStore.addBlock(revealState.indexh)">
         Добавить контент
       </button>
     </div>
@@ -21,13 +21,13 @@
       <Reveal
         class="redactor__reveal"
         v-model="revealState"
-        :slides="redactor.list"
+        :slides="redactorStore.list"
       >
         <SlideRedactor
-          v-for="(slide, index) in redactor.list"
+          v-for="(slide, index) in redactorStore.list"
           :key="slide"
-          v-model:settings="redactor.list[index].settings"
-          v-model:blocks="redactor.list[index].blocks"
+          v-model:settings="redactorStore.list[index].settings"
+          v-model:blocks="redactorStore.list[index].blocks"
           class="redactor__slide"
         >
         </SlideRedactor>
@@ -38,7 +38,7 @@
       <button
         class="redactor__add-slide"
         type="button"
-        @click="redactor.addSlide(revealState.indexh + 1)"
+        @click="redactorStore.addSlide(revealState.indexh + 1)"
       >
         Добавить слайд
       </button>
@@ -46,7 +46,7 @@
         class="redactor__remove-slide"
         type="button"
         @click="redactor.removeSlide(revealState.indexh)"
-        :disabled="redactor.list.length === 1"
+        :disabled="redactorStore.list.length === 1"
       >
         Удалить слайд
       </button>
@@ -58,13 +58,13 @@
 </template>
 
 <script setup>
-const redactor = useRedactor(),
+const redactorStore = useRedactor(),
   revealState = ref({ indexh: 0, indexv: 0 }),
-  activeSlide = ref(redactor.list[0]);
+  activeSlide = ref(redactorStore.list[0]);
 watch(
   revealState,
   (value) => {
-    activeSlide.value = redactor.list[value.indexh];
+    activeSlide.value = redactorStore.list[value.indexh];
   },
   { deep: true }
 );

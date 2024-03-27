@@ -19,16 +19,16 @@
 <script setup>
 const settings = defineModel("settings"),
   blocks = defineModel("blocks"),
-  redactor = useRedactor(),
+  redactorStore = useRedactor(),
   slideEl = ref(null),
   moveOptions = ref({ dragContainer: slideEl });
 
 function focus(model) {
-  redactor.activeBlock = model;
+  redactorStore.activeBlock = model;
 }
 
 function blur() {
-  redactor.activeBlock = null;
+  redactorStore.activeBlock = null;
 }
 </script>
 

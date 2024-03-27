@@ -2,7 +2,7 @@ interface SlideSettings {
   background: string;
 }
 
-interface slideBlock {
+interface slideTextBlock {
   type: "text";
   content: string;
   style: {
@@ -15,7 +15,7 @@ interface slideBlock {
 
 interface Slide {
   settings: SlideSettings;
-  blocks: slideBlock[];
+  blocks: slideTextBlock[];
 }
 
 export const useRedactor = defineStore("redactor", () => {
@@ -23,14 +23,14 @@ export const useRedactor = defineStore("redactor", () => {
       settings: { background: "white" },
       blocks: [],
     }),
-    defaultBlock = (): slideBlock => ({
+    defaultBlock = (): slideTextBlock => ({
       type: "text",
       content: "",
       style: { width: 0, height: 0, top: 0, left: 0 },
     });
 
   const list = ref<Slide[]>([defaultSlide()]),
-    activeBlock = ref<slideBlock | null>(null);
+    activeBlock = ref<slideTextBlock | null>(null);
 
   function addSlide(position: number) {
     list.value.splice(position, 0, defaultSlide());
