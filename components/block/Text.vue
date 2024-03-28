@@ -7,17 +7,19 @@
     @dblclick="toggleFocus"
     @click="focus"
   >
-    <Editable
+    <!-- <Editable
       v-model="model.content"
+      v-model:settings="model.settings"
       :is-editable="isEdit"
       ref="content"
       @input="updateMove"
-    />
+    /> -->
   </Move>
 </template>
 
 <script setup>
-const model = defineModel({ default: {} }),
+const redactorStore = useRedactor(),
+ model = defineModel({ default: {} }),
   props = defineProps({
     moveOptions: {
       type: Object,
@@ -27,6 +29,10 @@ const model = defineModel({ default: {} }),
         checkInput: false,
       },
     },
+    outsideTarget: {
+      type: HTMLElement,
+      default: document.body,
+    },
   }),
   moveOptions = ref({}),
   fullMoveOptions = computed(() => {
@@ -34,12 +40,14 @@ const model = defineModel({ default: {} }),
   }),
   move = ref(null),
   content = ref(null),
-  isFocus = ref(true),
+  isFocus = computed(() => {
+    return redactorStore.activeBlock.el === move.value.el
+  }),
   isEdit = ref(false),
   emit = defineEmits(["focus", "blur"]);
 
 function initMove() {
-  document.addEventListener("mousedown", outsideEvent);
+  props.outsideTarget.addEventListener("mousedown", outsideEvent);
 }
 
 function updateMove() {
@@ -50,11 +58,12 @@ function focus() {
   if (!isFocus.value) {
     console.log("focus");
     isEdit.value = false;
-    isFocus.value =
+    console.log(model.value)
+    redactorStore.changeActiveBlock(model.value)
       moveOptions.value.draggable =
       moveOptions.value.resizable =
         true;
-    document.addEventListener("mousedown", outsideEvent);
+    props.outsideTarget.addEventListener("mousedown", outsideEvent);
     emit("focus", model.value);
   }
 }
@@ -64,14 +73,14 @@ function outsideEvent(event) {
     event.target !== move.value.el &&
     !event.composedPath().includes(move.value.el)
   ) {
-    isFocus.value =
+
       isEdit.value =
       moveOptions.value.draggable =
       moveOptions.value.resizable =
         false;
 
     console.log("outside");
-    document.removeEventListener("mousedown", outsideEvent);
+    props.outsideTarget.removeEventListener("mousedown", outsideEvent);
     emit("blur");
   }
 }
@@ -84,7 +93,11 @@ async function toggleFocus() {
   content.value.el.focus();
 }
 
-onMounted(() => {
-  emit("focus", model.value);
+onMounted(async () => {
+  await nextTick()
+  model.value.el = move.value.el
+  redactorStore.changeActiveBlock(model.value)
+  // redactorStore.activeBlock = model.value
+  // emit("focus", model.value);
 });
 </script>

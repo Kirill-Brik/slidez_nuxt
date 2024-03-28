@@ -30,7 +30,8 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const interactOptions = ref({
+const redactorStore = useRedactor(),
+ interactOptions = ref({
     target: null,
     draggable: true,
     throttleDrag: 1,
@@ -78,6 +79,10 @@ watch(
   },
   { deep: true }
 );
+
+// watch(redactorStore.activeBlock, (value) => {
+//   console.log(value)
+// })
 
 function click(event) {
   emit("click", event);

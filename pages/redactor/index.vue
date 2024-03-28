@@ -33,7 +33,7 @@
         </SlideRedactor>
       </Reveal>
     </div>
-    <EditBlock class="redactor__content-editor" />
+    <SettingsBlock v-if="redactorStore.activeBlock" class="redactor__content-editor" />
     <div class="redactor__reveal-actions">
       <button
         class="redactor__add-slide"
