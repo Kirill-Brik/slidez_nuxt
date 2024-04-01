@@ -81,12 +81,14 @@ const deleteButtonDisabled = computed(
   () => list.value.length === 1 && !list.value[0]?.verticalSlides?.length
 );
 
-const revealState = ref({ indexh: 0, indexv: 0 })
+const revealState = ref({ indexh: 0, indexv: 0 });
 
 watch(
   revealState,
   (value) => {
-    activeSlide.value = list.value[value.indexh];
+    console.log(value);
+    if (!value.indexv) activeSlide.value = list.value[value.indexh];
+    else activeSlide.value = list.value[value.indexh].verticalSlides[value.indexv - 1];
   },
   { deep: true }
 );
