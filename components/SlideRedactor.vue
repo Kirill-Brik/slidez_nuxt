@@ -19,17 +19,20 @@
 </template>
 
 <script setup>
-const settings = defineModel("settings"),
-  blocks = defineModel("blocks"),
-  props = defineProps({
+const settings = defineModel("settings")
+const  blocks = defineModel("blocks")
+
+const props = defineProps({
     revealEl: {
       type: HTMLElement,
       default: document.body,
     },
   }),
-  redactorStore = useRedactor(),
-  slideEl = ref(null),
-  moveOptions = ref({ dragContainer: slideEl });
+
+const redactorStore = useRedactor()
+
+const slideEl = ref(null)
+const moveOptions = ref({ dragContainer: slideEl });
 
 function init(model) {
   console.log('init');

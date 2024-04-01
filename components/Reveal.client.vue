@@ -6,21 +6,21 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Reveal from "reveal.js";
 import Markdown from "reveal.js/plugin/markdown/markdown.js";
 
 const revealState = defineModel({}),
   reveal = ref(null),
   revealRef = ref(null),
-  props = defineProps({
-    slides: {
-      type: Array,
-    },
-  }),
-  slidesLenght = computed(() => {
-    return props.slides.length;
-  });
+  props = defineProps<{
+    slides: Slide[]
+  }>()
+
+const slidesLength = computed(() => props.slides.reduce((acc,slide) => {
+  return acc+= slide.verticalSlides ? slide.verticalSlides.length : 0
+},
+props.slides.length));
 
 onMounted(async () => {
   await nextTick();
@@ -36,7 +36,7 @@ onMounted(async () => {
   reveal.value.initialize();
 });
 
-watch(slidesLenght, async (value, oldValue) => {
+watch(slidesLength, async (value, oldValue) => {
   await nextTick();
   reveal.value.sync();
   if (value > oldValue) reveal.value.next();

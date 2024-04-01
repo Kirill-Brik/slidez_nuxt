@@ -4,6 +4,8 @@
     <div class="redactor__menu">
       <h2>Меню</h2>
       <span>Текущий слайд: {{ revealState.indexh + 1 }}</span>
+      <br />
+      <span>Текущая ступень: {{ revealState.indexv + 1 }}</span>
       <ul>
         <li v-for="block in activeSlide.blocks" tabindex="0">
           <template v-if="block.content">
@@ -13,59 +15,77 @@
           <template v-else> Text </template>
         </li>
       </ul>
-      <button type="button" @click="redactorStore.addBlock(revealState.indexh)">
+      <button
+        type="button"
+        @click="addBlock(revealState.indexh, revealState.indexv)"
+      >
         Добавить контент
       </button>
     </div>
     <div class="redactor__reveal-wrapper">
-      <Reveal
-        class="redactor__reveal"
-        v-model="revealState"
-        :slides="redactorStore.list"
-      >
-        <SlideRedactor
-          v-for="(slide, index) in redactorStore.list"
-          :key="slide"
-          v-model:settings="redactorStore.list[index].settings"
-          v-model:blocks="redactorStore.list[index].blocks"
-          :reveal-el="revealState.el"
-          class="redactor__slide"
-        >
-        </SlideRedactor>
+      <Reveal class="redactor__reveal" v-model="revealState" :slides="list">
+        <section v-for="(slide, indexv) in list" :key="indexv">
+          <SlideRedactor
+            v-model:settings="list[indexv].settings"
+            v-model:blocks="list[indexv].blocks"
+            class="redactor__slide"
+            :reveal-el="revealState.el"
+          />
+          <template v-if="slide.verticalSlides">
+            <SlideRedactor
+              v-for="(verticalSlide, indexh) in slide.verticalSlides"
+              v-model:settings="list[indexv].verticalSlides[indexh].settings"
+              v-model:blocks="list[indexv].verticalSlides[indexh].blocks"
+              class="redactor__slide"
+              :reveal-el="revealState.el"
+            />
+          </template>
+        </section>
       </Reveal>
     </div>
-    <SettingsBlock v-if="redactorStore.activeBlock" class="redactor__content-editor" />
+    <SettingsBlock v-if="activeBlock" class="redactor__content-editor" />
     <div class="redactor__reveal-actions">
       <button
         class="redactor__add-slide"
         type="button"
-        @click="redactorStore.addSlide(revealState.indexh + 1)"
+        @click="addSlide(revealState.indexh + 1)"
       >
         Добавить слайд
       </button>
       <button
         class="redactor__remove-slide"
         type="button"
-        @click="redactor.removeSlide(revealState.indexh)"
-        :disabled="redactorStore.list.length === 1"
+        @click="removeSlide(revealState.indexh, revealState.indexv)"
+        :disabled="deleteButtonDisabled"
       >
         Удалить слайд
       </button>
-      <button class="redactor__add-subslide" type="button">
+      <button
+        class="redactor__add-subslide"
+        type="button"
+        @click="addVerticalSlide(revealState.indexh, revealState.indexv)"
+      >
         Добавить ступень
       </button>
     </div>
   </main>
 </template>
 
-<script setup>
-const redactorStore = useRedactor(),
-  revealState = ref({ indexh: 0, indexv: 0 }),
-  activeSlide = ref(redactorStore.list[0]);
+<script setup lang="ts">
+const { list, addBlock, addVerticalSlide, addSlide, removeSlide, activeBlock } =
+  useRedactor();
+
+const deleteButtonDisabled = computed(
+  () => list.length === 1 && !list[0]?.verticalSlides?.length
+);
+
+const revealState = ref({ indexh: 0, indexv: 0 }),
+  activeSlide = ref(list[0]);
+
 watch(
   revealState,
   (value) => {
-    activeSlide.value = redactorStore.list[value.indexh];
+    activeSlide.value = list[value.indexh];
   },
   { deep: true }
 );
