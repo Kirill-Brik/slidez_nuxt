@@ -36,13 +36,10 @@ const moveOptions = ref({ dragContainer: slideEl });
 
 function init(model) {
   console.log("init");
-  // if (redactorStore.activeBlock) redactorStore.activeBlock.blur();
-  // redactorStore.changeActiveBlock(model);
   model.focus();
 }
 
 function focus(model) {
-  console.log(redactorStore.activeBlock);
   if (redactorStore.activeBlock) redactorStore.activeBlock.blur();
   redactorStore.changeActiveBlock(model);
 }
