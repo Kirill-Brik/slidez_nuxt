@@ -72,20 +72,22 @@
 </template>
 
 <script setup lang="ts">
-const { list, addBlock, addVerticalSlide, addSlide, removeSlide, activeBlock } =
-  useRedactor();
+const redactorStore = useRedactor();
+const { list, activeBlock } = storeToRefs(redactorStore);
+
+const { addBlock, addVerticalSlide, addSlide, removeSlide } = redactorStore;
 
 const deleteButtonDisabled = computed(
-  () => list.length === 1 && !list[0]?.verticalSlides?.length
+  () => list.value.length === 1 && !list.value[0]?.verticalSlides?.length
 );
 
 const revealState = ref({ indexh: 0, indexv: 0 }),
-  activeSlide = ref(list[0]);
+  activeSlide = ref(list.value[0]);
 
 watch(
   revealState,
   (value) => {
-    activeSlide.value = list[value.indexh];
+    activeSlide.value = list.value[value.indexh];
   },
   { deep: true }
 );

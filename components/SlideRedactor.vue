@@ -19,23 +19,23 @@
 </template>
 
 <script setup>
-const settings = defineModel("settings")
-const  blocks = defineModel("blocks")
+const settings = defineModel("settings");
+const blocks = defineModel("blocks");
 
 const props = defineProps({
-    revealEl: {
-      type: HTMLElement,
-      default: document.body,
-    },
-  }),
+  revealEl: {
+    type: HTMLElement,
+    default: document.body,
+  },
+});
 
-const redactorStore = useRedactor()
+const redactorStore = useRedactor();
 
-const slideEl = ref(null)
+const slideEl = ref(null);
 const moveOptions = ref({ dragContainer: slideEl });
 
 function init(model) {
-  console.log('init');
+  console.log("init");
   // if (redactorStore.activeBlock) redactorStore.activeBlock.blur();
   // redactorStore.changeActiveBlock(model);
   model.focus();

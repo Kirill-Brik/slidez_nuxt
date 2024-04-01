@@ -23,6 +23,8 @@ interface SlideTextBlock extends SlideBlock {
   type: "text";
   content: string;
   settings: TextSettings;
+  focus(): void,
+  blur(): void,
 }
 
 interface Slide {
