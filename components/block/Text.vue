@@ -7,19 +7,19 @@
     @dblclick="toggleFocus"
     @click="focus"
   >
-    <!-- <Editable
+    <Editable
       v-model="model.content"
       v-model:settings="model.settings"
       :is-editable="isEdit"
       ref="content"
       @input="updateMove"
-    /> -->
+    />
   </Move>
 </template>
 
 <script setup>
 const redactorStore = useRedactor(),
- model = defineModel({ default: {} }),
+  model = defineModel({ default: {} }),
   props = defineProps({
     moveOptions: {
       type: Object,
@@ -40,9 +40,7 @@ const redactorStore = useRedactor(),
   }),
   move = ref(null),
   content = ref(null),
-  isFocus = computed(() => {
-    return redactorStore.activeBlock.el === move.value.el
-  }),
+  isFocus = ref(false),
   isEdit = ref(false),
   emit = defineEmits(["focus", "blur"]);
 
@@ -57,12 +55,9 @@ function updateMove() {
 function focus() {
   if (!isFocus.value) {
     console.log("focus");
-    isEdit.value = false;
-    console.log(model.value)
-    redactorStore.changeActiveBlock(model.value)
-      moveOptions.value.draggable =
-      moveOptions.value.resizable =
-        true;
+    isFocus.value = isEdit.value = false;
+    // redactorStore.changeActiveBlock(model.value)
+    moveOptions.value.draggable = moveOptions.value.resizable = true;
     props.outsideTarget.addEventListener("mousedown", outsideEvent);
     emit("focus", model.value);
   }
@@ -73,7 +68,7 @@ function outsideEvent(event) {
     event.target !== move.value.el &&
     !event.composedPath().includes(move.value.el)
   ) {
-
+    isFocus.value =
       isEdit.value =
       moveOptions.value.draggable =
       moveOptions.value.resizable =
@@ -94,10 +89,10 @@ async function toggleFocus() {
 }
 
 onMounted(async () => {
-  await nextTick()
-  model.value.el = move.value.el
-  redactorStore.changeActiveBlock(model.value)
+  await nextTick();
+  model.value.el = move.value.el;
+  // redactorStore.changeActiveBlock(model.value)
   // redactorStore.activeBlock = model.value
-  // emit("focus", model.value);
+  focus();
 });
 </script>

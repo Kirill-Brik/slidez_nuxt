@@ -46,9 +46,9 @@ function focus(event) {
 
 function blur(event) {
   console.log("blur");
-  const selection = document.getSelection();
-  if (!selection.isCollapsed)
-    console.log(selection.toString())
+  // const selection = document.getSelection();
+  // if (!selection.isCollapsed)
+  //   console.log(selection.toString())
 }
 
 function changeStyle() {
@@ -77,17 +77,17 @@ function saveSelected() {
 }
 
 onMounted(() => {
-  document.addEventListener("selectionchange", (event) => {
-    const selection = document.getSelection().toString();
-    console.log(selection);
-    // if (!selection.isCollapsed) {
-    //   document.execCommand(
-    //     "insertHTML",
-    //     false,
-    //     `<span class='editable__select'>` + document.getSelection() + `</span>`
-    //   );
-    // }
-  });
+  // document.addEventListener("selectionchange", (event) => {
+  //   const selection = document.getSelection().toString();
+  //   console.log(selection);
+  //   // if (!selection.isCollapsed) {
+  //   //   document.execCommand(
+  //   //     "insertHTML",
+  //   //     false,
+  //   //     `<span class='editable__select'>` + document.getSelection() + `</span>`
+  //   //   );
+  //   // }
+  // });
 });
 
 defineExpose({

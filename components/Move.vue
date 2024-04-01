@@ -157,6 +157,7 @@ defineExpose({
   background-color: aquamarine;
   // border: 1px dashed blue;
   width: 150px;
+  height: 20px;
 
   &__wrapper {
     position: absolute;
