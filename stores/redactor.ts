@@ -1,35 +1,3 @@
-interface SlideSettings {
-  background: string;
-}
-
-interface TextSettings {
-  name: string;
-  size: number;
-  style: string;
-  weight: number;
-}
-
-interface SlideBlock {
-  el: HTMLElement | null,
-  style: {
-    width: number;
-    height: number;
-    top: number;
-    left: number;
-  };
-}
-
-interface SlideTextBlock extends SlideBlock {
-  type: "text";
-  content: string;
-  settings: TextSettings;
-}
-
-interface Slide {
-  settings: SlideSettings;
-  blocks: SlideTextBlock[];
-}
-
 export const useRedactor = defineStore("redactor", () => {
   const defaultSlide = (): Slide => ({
       settings: { background: "white" },
@@ -72,20 +40,50 @@ export const useRedactor = defineStore("redactor", () => {
     activeBlock = ref<SlideBlock | null>(null),
     fontStore = useFont();
 
-  function addSlide(position: number) {
-    list.value.splice(position, 0, defaultSlide());
+  function addSlide(h: number) {
+    list.value.splice(h, 0, defaultSlide());
   }
-  function removeSlide(position: number) {
-    list.value.splice(position, 1);
+  function removeSlide(h: number, v: number) {
+    if (!list.value[h]?.verticalSlides?.length) {
+      list.value.splice(h, 1);
+      return
+    }
+    if (!v) {
+      const nextSlideH = list.value[h].verticalSlides[0]
+      nextSlideH.verticalSlides = list.value[h].verticalSlides.slice(1)
+
+      list.value[h] = nextSlideH
+      return
+    }
+    list.value[h].verticalSlides.splice(v-1,1)
   }
-  function addBlock(slide: number) {
-    list.value[slide].blocks.push(defaultTextBlock());
+  function addVerticalSlide(h:number,v:number) {
+    if (list.value[h]?.verticalSlides?.length) {
+      list.value[h].verticalSlides.splice(v-1, 0, defaultSlide())
+      return
+    }
+    list.value[h].verticalSlides = [defaultSlide()]
+  }
+  function addBlock(h: number, v:number) {
+    if (!v) {
+      list.value[h].blocks.push(defaultTextBlock());
+      return
+    }
+    if (list.value[h].verticalSlides) {
+      list.value[h].verticalSlides[v-1].blocks.push(defaultTextBlock())
+    }
   }
 
   function changeActiveBlock(block: SlideBlock) {
     activeBlock.value = block
   }
-  return { list, addSlide, removeSlide, activeBlock, addBlock, changeActiveBlock };
+  return {
+    list,
+    addSlide,
+    addVerticalSlide,
+    removeSlide,
+    activeBlock,
+    addBlock,
+    changeActiveBlock
+  };
 });
-
-export type {Slide, SlideSettings, SlideBlock, TextSettings, SlideTextBlock,}

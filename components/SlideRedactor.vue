@@ -18,10 +18,12 @@
 
 <script setup>
 const settings = defineModel("settings"),
-  blocks = defineModel("blocks"),
-  redactorStore = useRedactor(),
-  slideEl = ref(null),
-  moveOptions = ref({ dragContainer: slideEl });
+  blocks = defineModel("blocks")
+
+const redactorStore = useRedactor()
+
+const slideEl = ref(null)
+const moveOptions = ref({ dragContainer: slideEl });
 
 function focus(model) {
   redactorStore.activeBlock = model;
