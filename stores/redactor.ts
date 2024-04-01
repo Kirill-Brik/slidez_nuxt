@@ -17,6 +17,8 @@ interface SlideBlock {
     top: number;
     left: number;
   };
+  focus(): void,
+  blur(): void,
 }
 
 interface SlideTextBlock extends SlideBlock {

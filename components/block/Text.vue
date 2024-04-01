@@ -18,8 +18,7 @@
 </template>
 
 <script setup>
-const redactorStore = useRedactor(),
-  model = defineModel({ default: {} }),
+const model = defineModel({ default: {} }),
   props = defineProps({
     moveOptions: {
       type: Object,
@@ -33,6 +32,10 @@ const redactorStore = useRedactor(),
       type: HTMLElement,
       default: document.body,
     },
+    isFocus: {
+      type: Boolean,
+      default: false,
+    },
   }),
   moveOptions = ref({}),
   fullMoveOptions = computed(() => {
@@ -42,7 +45,8 @@ const redactorStore = useRedactor(),
   content = ref(null),
   isFocus = ref(false),
   isEdit = ref(false),
-  emit = defineEmits(["focus", "blur"]);
+  emit = defineEmits(["focus", "blur", "init"]),
+  redactor = useRedactor();
 
 function initMove() {
   props.outsideTarget.addEventListener("mousedown", outsideEvent);
@@ -55,29 +59,34 @@ function updateMove() {
 function focus() {
   if (!isFocus.value) {
     console.log("focus");
-    isFocus.value = isEdit.value = false;
-    // redactorStore.changeActiveBlock(model.value)
-    moveOptions.value.draggable = moveOptions.value.resizable = true;
+    isEdit.value = false;
+    isFocus.value =
+      moveOptions.value.draggable =
+      moveOptions.value.resizable =
+        true;
     props.outsideTarget.addEventListener("mousedown", outsideEvent);
     emit("focus", model.value);
   }
+}
+
+function blur() {
+  isFocus.value =
+    isEdit.value =
+    moveOptions.value.draggable =
+    moveOptions.value.resizable =
+      false;
+
+  console.log("outside");
+  props.outsideTarget.removeEventListener("mousedown", outsideEvent);
+  emit("blur");
 }
 
 function outsideEvent(event) {
   if (
     event.target !== move.value.el &&
     !event.composedPath().includes(move.value.el)
-  ) {
-    isFocus.value =
-      isEdit.value =
-      moveOptions.value.draggable =
-      moveOptions.value.resizable =
-        false;
-
-    console.log("outside");
-    props.outsideTarget.removeEventListener("mousedown", outsideEvent);
-    emit("blur");
-  }
+  )
+    blur();
 }
 
 async function toggleFocus() {
@@ -89,10 +98,10 @@ async function toggleFocus() {
 }
 
 onMounted(async () => {
+  model.value.focus = focus;
+  model.value.blur = blur;
   await nextTick();
   model.value.el = move.value.el;
-  // redactorStore.changeActiveBlock(model.value)
-  // redactorStore.activeBlock = model.value
-  focus();
+  emit("init", model.value);
 });
 </script>

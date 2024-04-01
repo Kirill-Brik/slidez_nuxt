@@ -12,6 +12,7 @@
         :outside-target="revealEl"
         @focus="focus"
         @blur="blur"
+        @init="init"
       />
     </template>
   </section>
@@ -23,19 +24,28 @@ const settings = defineModel("settings"),
   props = defineProps({
     revealEl: {
       type: HTMLElement,
-      default: document.body
-    }
+      default: document.body,
+    },
   }),
   redactorStore = useRedactor(),
   slideEl = ref(null),
   moveOptions = ref({ dragContainer: slideEl });
 
+function init(model) {
+  console.log('init');
+  // if (redactorStore.activeBlock) redactorStore.activeBlock.blur();
+  // redactorStore.changeActiveBlock(model);
+  model.focus();
+}
+
 function focus(model) {
-  redactorStore.activeBlock = model;
+  console.log(redactorStore.activeBlock);
+  if (redactorStore.activeBlock) redactorStore.activeBlock.blur();
+  redactorStore.changeActiveBlock(model);
 }
 
 function blur() {
-  redactorStore.activeBlock = null;
+  redactorStore.changeActiveBlock(null);
 }
 </script>
 

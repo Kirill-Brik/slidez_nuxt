@@ -33,11 +33,11 @@ defineOptions({
 const redactorStore = useRedactor(),
  interactOptions = ref({
     target: null,
-    draggable: true,
+    draggable: false,
     throttleDrag: 1,
     startDragRotate: 0,
     throttleDragRotate: 0,
-    resizable: true,
+    resizable: false,
     throttleResize: 1,
     edge: true,
   }),
@@ -79,10 +79,6 @@ watch(
   },
   { deep: true }
 );
-
-// watch(redactorStore.activeBlock, (value) => {
-//   console.log(value)
-// })
 
 function click(event) {
   emit("click", event);
