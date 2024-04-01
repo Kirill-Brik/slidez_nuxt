@@ -24,7 +24,7 @@
     </div>
     <div class="redactor__reveal-wrapper">
       <Reveal class="redactor__reveal" v-model="revealState" :slides="list">
-        <section v-for="(slide, indexv) in list" :key="indexv">
+        <section v-for="(slide, indexv) in list" :key="slide">
           <SlideRedactor
             v-model:settings="list[indexv].settings"
             v-model:blocks="list[indexv].blocks"
@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 const redactorStore = useRedactor();
-const { list, activeBlock } = storeToRefs(redactorStore);
+const { list, activeBlock, activeSlide } = storeToRefs(redactorStore);
 
 const { addBlock, addVerticalSlide, addSlide, removeSlide } = redactorStore;
 
@@ -81,8 +81,7 @@ const deleteButtonDisabled = computed(
   () => list.value.length === 1 && !list.value[0]?.verticalSlides?.length
 );
 
-const revealState = ref({ indexh: 0, indexv: 0 }),
-  activeSlide = ref(list.value[0]);
+const revealState = ref({ indexh: 0, indexv: 0 })
 
 watch(
   revealState,

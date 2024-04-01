@@ -38,6 +38,7 @@ export const useRedactor = defineStore("redactor", () => {
 
   const list = ref<Slide[]>([defaultSlide()]),
     activeBlock = ref<SlideBlock | null>(null),
+    activeSlide = ref<Slide>(list.value[0]),
     fontStore = useFont();
 
   function addSlide(h: number) {
@@ -48,6 +49,7 @@ export const useRedactor = defineStore("redactor", () => {
       list.value.splice(h, 1);
       return
     }
+    console.log(h, v)
     if (!v) {
       const nextSlideH = list.value[h].verticalSlides[0]
       nextSlideH.verticalSlides = list.value[h].verticalSlides.slice(1)
@@ -63,6 +65,9 @@ export const useRedactor = defineStore("redactor", () => {
       return
     }
     list.value[h].verticalSlides = [defaultSlide()]
+  }
+  function changeActiveSlide(slide: Slide) {
+    activeSlide.value = slide
   }
   function addBlock(h: number, v:number) {
     if (!v) {
@@ -82,6 +87,8 @@ export const useRedactor = defineStore("redactor", () => {
     addSlide,
     addVerticalSlide,
     removeSlide,
+    activeSlide,
+    changeActiveSlide,
     activeBlock,
     addBlock,
     changeActiveBlock
