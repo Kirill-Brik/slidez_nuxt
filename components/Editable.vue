@@ -40,8 +40,7 @@ function update(event) {
 }
 
 function focus(event) {
-  console.log('focus')
-
+  console.log("focus");
 }
 
 function blur(event) {
@@ -77,17 +76,23 @@ function saveSelected() {
 }
 
 onMounted(() => {
-  // document.addEventListener("selectionchange", (event) => {
-  //   const selection = document.getSelection().toString();
-  //   console.log(selection);
-  //   // if (!selection.isCollapsed) {
-  //   //   document.execCommand(
-  //   //     "insertHTML",
-  //   //     false,
-  //   //     `<span class='editable__select'>` + document.getSelection() + `</span>`
-  //   //   );
-  //   // }
-  // });
+  document.addEventListener("selectionchange", (event) => {
+    const selection = document.getSelection();
+    if (!selection.isCollapsed) {
+      console.log(selection.toString());
+      const end = selection.focusOffset;
+      const start = selection.anchorOffset;
+      const endNode = selection.focusNode;
+      console.log(selection.anchorOffset, selection.focusOffset);
+      document.execCommand(
+        "insertHTML",
+        false,
+        `<span class='editable__select'>` + document.getSelection() + `</span>`
+      );
+      const newselection = document.getSelection();
+      if (start > end) newselection.collapse(endNode, end);
+    }
+  });
 });
 
 defineExpose({
@@ -110,7 +115,7 @@ defineExpose({
   }
 
   &__select {
-    background-color: var(--el-color-primary);
+    background-color: red;
   }
 
   &__text {
