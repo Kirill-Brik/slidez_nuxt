@@ -28,7 +28,7 @@ onMounted(async () => {
     disableLayout: true,
     // plugins: [Markdown],
   });
-  revealState.value = { indexh: 0, indexv: 0 };
+  revealState.value = { indexh: 0, indexv: 0, el: revealRef.value };
   reveal.value.on("slidechanged", (event) => {
     revealState.value.indexh = event.indexh;
     revealState.value.indexv = event.indexv;

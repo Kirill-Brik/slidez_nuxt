@@ -28,6 +28,7 @@
           :key="slide"
           v-model:settings="redactorStore.list[index].settings"
           v-model:blocks="redactorStore.list[index].blocks"
+          :reveal-el="revealState.el"
           class="redactor__slide"
         >
         </SlideRedactor>

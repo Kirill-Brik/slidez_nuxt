@@ -9,6 +9,7 @@
         v-if="block.type === 'text'"
         v-model="blocks[index]"
         :move-options="moveOptions"
+        :outside-target="revealEl"
         @focus="focus"
         @blur="blur"
       />
@@ -19,6 +20,12 @@
 <script setup>
 const settings = defineModel("settings"),
   blocks = defineModel("blocks"),
+  props = defineProps({
+    revealEl: {
+      type: HTMLElement,
+      default: document.body
+    }
+  }),
   redactorStore = useRedactor(),
   slideEl = ref(null),
   moveOptions = ref({ dragContainer: slideEl });
