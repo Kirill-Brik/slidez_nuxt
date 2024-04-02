@@ -1,3 +1,5 @@
+import {EBlockTypes} from './redactor.i.ts'
+
 export const useRedactor = defineStore("redactor", () => {
   const defaultSlide = (): Slide => ({
       settings: { background: "white" },
@@ -28,16 +30,18 @@ export const useRedactor = defineStore("redactor", () => {
         weight,
       };
       const textBlock = <SlideTextBlock>{
-        type: "text",
+        type: EBlockTypes.TEXT,
         content: "",
         style: { width: 0, height: 0, top: 0, left: 0 },
         settings,
       };
       return textBlock;
-    };
+    },
+    defaultImageBlock = (): SlideImageBlock => {
+
+    }
 
   const list = ref<Slide[]>([defaultSlide()]),
-    activeBlock = ref<SlideBlock | null>(null),
     activeSlide = ref<Slide>(list.value[0]),
     fontStore = useFont();
 
@@ -49,7 +53,6 @@ export const useRedactor = defineStore("redactor", () => {
       list.value.splice(h, 1);
       return
     }
-    console.log(h, v)
     if (!v) {
       const nextSlideH = list.value[h].verticalSlides[0]
       nextSlideH.verticalSlides = list.value[h].verticalSlides.slice(1)
@@ -78,9 +81,14 @@ export const useRedactor = defineStore("redactor", () => {
       list.value[h].verticalSlides[v-1].blocks.push(defaultTextBlock())
     }
   }
-
-  function changeActiveBlock(block: SlideBlock) {
-    activeBlock.value = block
+  function addImageBlock (h: number, v: number) {
+    if (!v) {
+      list.value[h].blocks.push(defaultTextBlock());
+      return
+    }
+    if (list.value[h].verticalSlides) {
+      list.value[h].verticalSlides[v-1].blocks.push(defaultTextBlock())
+    }
   }
   return {
     list,
@@ -89,8 +97,7 @@ export const useRedactor = defineStore("redactor", () => {
     removeSlide,
     activeSlide,
     changeActiveSlide,
-    activeBlock,
     addBlock,
-    changeActiveBlock
+    addImageBlock,
   };
 });

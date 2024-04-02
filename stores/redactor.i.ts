@@ -1,3 +1,8 @@
+export enum EBlockTypes {
+  TEXT = "text",
+  IMAGE = 'image',
+}
+
 interface SlideSettings {
   background: string;
 }
@@ -10,6 +15,8 @@ interface TextSettings {
 }
 
 interface SlideBlock {
+  focused?: boolean,
+  editable?: boolean,
   el: HTMLElement | null,
   style: {
     width: number;
@@ -20,8 +27,18 @@ interface SlideBlock {
 }
 
 interface SlideTextBlock extends SlideBlock {
-  type: "text";
+  type: EBlockTypes.TEXT;
   content: string;
+  settings: TextSettings;
+  focus(): void,
+  blur(): void,
+}
+
+interface SlideImageBlock extends SlideBlock {
+  type: EBlockTypes.IMAGE;
+  image: {
+    url: string
+  };
   settings: TextSettings;
   focus(): void,
   blur(): void,
