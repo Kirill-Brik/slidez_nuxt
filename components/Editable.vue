@@ -13,15 +13,16 @@
 </template>
 
 <script setup>
-const editableEl = ref(null),
-  model = defineModel({ default: { value: "", text: "" } }),
-  settings = defineModel("settings", { default: {} }),
-  props = defineProps({
-    isEditable: {
-      default: true,
-    },
-  }),
-  emit = defineEmits(["input"]);
+const editableEl = ref(null);
+const model = defineModel({ default: { value: "", text: "" } });
+const settings = defineModel("settings", { default: {} });
+const props = defineProps({
+  isEditable: {
+    default: true,
+  },
+});
+const selection = ref(null);
+const emit = defineEmits(["input"]);
 
 watch(
   settings,
@@ -45,6 +46,16 @@ function focus(event) {
 
 function blur(event) {
   console.log("blur");
+  document.removeEventListener("selectionchange", saveSelected);
+  console.log(selection.value);
+  // document.execCommand(
+  //   "insertHTML",
+  //   false,
+  //   `<span class='editable__select'>` + selection.value + `</span>`
+  // );
+  // selection.value.anchorOffset = {...selection.value, ...{anchorOffset: 0}}
+  selection.value.setBaseAndExtent(selection.value.anchorNode, selection.value.anchorOffset,  selection.value.focusNode , selection.value.focusOffset)
+  console.log(selection.value.anchorNode, selection.value.anchorOffset, selection.value.focusNode , selection.value.focusOffset )
   // const selection = document.getSelection();
   // if (!selection.isCollapsed)
   //   console.log(selection.toString())
@@ -63,35 +74,17 @@ function changeStyle() {
 
 function saveSelected() {
   console.log("select");
-  const selection = document.getSelection();
-  if (!selection.isCollapsed)
-    document
-      .getSelection()
-      .setBaseAndExtent(
-        editableEl.value,
-        0,
-        editableEl.value,
-        editableEl.value.childNodes.length
-      );
+  selection.value = document.getSelection();
 }
 
-onMounted(() => {
-  document.addEventListener("selectionchange", (event) => {
-    const selection = document.getSelection();
-    if (!selection.isCollapsed) {
-      console.log(selection.toString());
-      const end = selection.focusOffset;
-      const start = selection.anchorOffset;
-      const endNode = selection.focusNode;
-      console.log(selection.anchorOffset, selection.focusOffset);
-      document.execCommand(
-        "insertHTML",
-        false,
-        `<span class='editable__select'>` + document.getSelection() + `</span>`
-      );
-      const newselection = document.getSelection();
-      if (start > end) newselection.collapse(endNode, end);
-    }
+onMounted(async () => {
+  await nextTick();
+  editableEl.value.addEventListener("selectstart", (event) => {
+    if (selection.value) {
+      console.log(selection.value.anchorNode)
+      document.execCommand("insertHTML", false, selection.value.toString());
+    };
+    document.addEventListener("selectionchange", saveSelected)
   });
 });
 
@@ -114,8 +107,12 @@ defineExpose({
     outline: none;
   }
 
+  &::selection {
+    background-color: cadetblue;
+  }
+
   &__select {
-    background-color: red;
+    background-color: cadetblue;
   }
 
   &__text {
