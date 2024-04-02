@@ -6,19 +6,19 @@
   >
     <template v-for="(block, index) in blocks">
       <BlockText
-        v-if="block.type === 'text'"
+      @click.stop
+        v-if="block.type === EBlockTypes.TEXT"
         v-model="blocks[index]"
         :move-options="moveOptions"
         :outside-target="revealEl"
-        @focus="focus"
-        @blur="blur"
-        @init="init"
       />
     </template>
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import {EBlockTypes} from '@/stores/redactor.i.ts'
+
 const settings = defineModel("settings");
 const blocks = defineModel("blocks");
 
@@ -29,24 +29,8 @@ const props = defineProps({
   },
 });
 
-const redactorStore = useRedactor();
-
 const slideEl = ref(null);
 const moveOptions = ref({ dragContainer: slideEl });
-
-function init(model) {
-  console.log("init");
-  model.focus();
-}
-
-function focus(model) {
-  if (redactorStore.activeBlock) redactorStore.activeBlock.blur();
-  redactorStore.changeActiveBlock(model);
-}
-
-function blur() {
-  redactorStore.changeActiveBlock(null);
-}
 </script>
 
 <style lang="scss" scoped>

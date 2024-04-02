@@ -21,8 +21,14 @@
       >
         Добавить контент
       </button>
+      <button
+        type="button"
+        @click="addImageBlock(revealState.indexh, revealState.indexv)"
+      >
+        Добавить изображение
+      </button>
     </div>
-    <div class="redactor__reveal-wrapper">
+    <div class="redactor__reveal-wrapper" @click.stop="blockFocusStore.clearActiveBlock()">
       <Reveal class="redactor__reveal" v-model="revealState" :slides="list">
         <section v-for="(slide, indexv) in list" :key="slide">
           <SlideRedactor
@@ -73,9 +79,18 @@
 
 <script setup lang="ts">
 const redactorStore = useRedactor();
-const { list, activeBlock, activeSlide } = storeToRefs(redactorStore);
+const blockFocusStore = useBlockFocus();
 
-const { addBlock, addVerticalSlide, addSlide, removeSlide } = redactorStore;
+const { list, activeSlide } = storeToRefs(redactorStore);
+const { activeBlock } = storeToRefs(blockFocusStore );
+
+const {
+  addBlock,
+  addVerticalSlide,
+  addSlide,
+  removeSlide,
+  addImageBlock
+} = redactorStore;
 
 const deleteButtonDisabled = computed(
   () => list.value.length === 1 && !list.value[0]?.verticalSlides?.length
@@ -86,7 +101,6 @@ const revealState = ref({ indexh: 0, indexv: 0 });
 watch(
   revealState,
   (value) => {
-    console.log(value);
     if (!value.indexv) activeSlide.value = list.value[value.indexh];
     else activeSlide.value = list.value[value.indexh].verticalSlides[value.indexv - 1];
   },

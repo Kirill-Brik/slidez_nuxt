@@ -5,8 +5,6 @@
     :contenteditable="isEditable"
     @input="update"
     placeholder="text"
-    @focus="focus"
-    @blur="blur"
   >
     <div class="editable__text"></div>
   </div>
@@ -39,18 +37,6 @@ function update(event) {
   emit("input", event);
 }
 
-function focus(event) {
-  console.log('focus')
-
-}
-
-function blur(event) {
-  console.log("blur");
-  // const selection = document.getSelection();
-  // if (!selection.isCollapsed)
-  //   console.log(selection.toString())
-}
-
 function changeStyle() {
   const selection = document.getSelection();
   // console.log(selection);
@@ -75,20 +61,6 @@ function saveSelected() {
         editableEl.value.childNodes.length
       );
 }
-
-onMounted(() => {
-  // document.addEventListener("selectionchange", (event) => {
-  //   const selection = document.getSelection().toString();
-  //   console.log(selection);
-  //   // if (!selection.isCollapsed) {
-  //   //   document.execCommand(
-  //   //     "insertHTML",
-  //   //     false,
-  //   //     `<span class='editable__select'>` + document.getSelection() + `</span>`
-  //   //   );
-  //   // }
-  // });
-});
 
 defineExpose({
   el: editableEl,
