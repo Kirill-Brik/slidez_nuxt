@@ -1,10 +1,9 @@
 <template>
   <BlockLayout
-  v-model="model"
-  ref="move"
-  :moveOptions="moveOptions"
-  @toggle-focus="toggleFocus"
-  @focus="focus"
+    v-model="model"
+    ref="move"
+    :moveOptions="moveOptions"
+    @toggle-focus="toggleFocus"
   >
     <Editable
       v-model="model.content"
@@ -17,8 +16,6 @@
 </template>
 
 <script setup>
-const {changeActiveBlock} = useBlockFocus();
-
 const model = defineModel({ default: {} }),
   props = defineProps({
     moveOptions: {
@@ -33,19 +30,13 @@ const model = defineModel({ default: {} }),
       type: HTMLElement,
       default: document.body,
     },
-  })
+  });
 
-  const move = ref(null),
-  content = ref(null)
+const move = ref(null),
+  content = ref(null);
 
 function updateMove() {
   move.value.update();
-}
-
-function focus() {
-  if (!model.value.focused) {
-    changeActiveBlock(model.value)
-  }
 }
 
 async function toggleFocus() {
