@@ -1,20 +1,22 @@
 export const useBlockFocus = defineStore("blockFocus", () => {
-  const activeBlock = ref<SlideBlock | null>(null)
+  const activeBlock = ref<SlideBlock | null>(null);
 
   function changeActiveBlock(block: SlideBlock) {
     if (activeBlock.value) {
-      activeBlock.value.editable = activeBlock.value.focused = false
+      activeBlock.value.editable = activeBlock.value.focused = false;
     }
 
-    activeBlock.value = block
-    activeBlock.value.editable = false
-    activeBlock.value.focused = true
+    activeBlock.value = block;
+    activeBlock.value.editable = false;
+    activeBlock.value.focused = true;
   }
 
   function clearActiveBlock() {
-    console.log("outside")
-    activeBlock.value.editable = activeBlock.value.focused = false
-    activeBlock.value = null
+    if (activeBlock.value) {
+      console.log("outside");
+      activeBlock.value.editable = activeBlock.value.focused = false;
+      activeBlock.value = null;
+    }
   }
 
   function makeEditable() {
@@ -25,6 +27,6 @@ export const useBlockFocus = defineStore("blockFocus", () => {
     activeBlock,
     changeActiveBlock,
     clearActiveBlock,
-    makeEditable
-  }
-})
+    makeEditable,
+  };
+});
