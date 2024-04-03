@@ -77,23 +77,13 @@ const fontStore = useFont(),
     else return [];
   });
 
-function initDefaultSettings() {
-  let style = activeFont.value.style.find((style) => style.type === "normal");
-  if (style) textSetting.value.style = style.type;
-  else textSetting.value.style = activeFont.value.style[0].type;
-  if (constActiveWeight.value.length) {
-    let weight = constActiveWeight.value.includes(400)
-      ? 400
-      : constActiveWeight.value[0];
-    textSetting.value.weight = weight;
-  } else {
-    let weight = variableActiveWeight.value.find(
-      (weight) => weight.min < 400 && weight.max > 400
-    );
-    if (weight) textSetting.value.weight = weight;
-    else textSetting.value.weight = variableActiveWeight.value[0].min;
-  }
-}
+watch(textSetting, (value) => {
+  blockFocusStore.activeBlock.settings = textSetting.value
+}, {deep: true})
+
+watch(blockFocusStore.activeBlock, (value) => {
+  textSetting.value = blockFocusStore.activeBlock.settings
+})
 
 onMounted(() => {
   // initDefaultSettings();
