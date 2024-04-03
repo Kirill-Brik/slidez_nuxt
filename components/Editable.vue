@@ -5,8 +5,6 @@
     :contenteditable="isEditable"
     @input="update"
     placeholder="text"
-    @focus="focus"
-    @blur="blur"
   >
     <div class="editable__text"></div>
   </div>
@@ -38,27 +36,6 @@ function update(event) {
     text: editableEl.value.innerText,
   };
   emit("input", event);
-}
-
-function focus(event) {
-  console.log("focus");
-}
-
-function blur(event) {
-  console.log("blur");
-  document.removeEventListener("selectionchange", saveSelected);
-  console.log(selection.value);
-  // document.execCommand(
-  //   "insertHTML",
-  //   false,
-  //   `<span class='editable__select'>` + selection.value + `</span>`
-  // );
-  // selection.value.anchorOffset = {...selection.value, ...{anchorOffset: 0}}
-  selection.value.setBaseAndExtent(selection.value.anchorNode, selection.value.anchorOffset,  selection.value.focusNode , selection.value.focusOffset)
-  console.log(selection.value.anchorNode, selection.value.anchorOffset, selection.value.focusNode , selection.value.focusOffset )
-  // const selection = document.getSelection();
-  // if (!selection.isCollapsed)
-  //   console.log(selection.toString())
 }
 
 function changeStyle() {

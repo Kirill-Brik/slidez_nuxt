@@ -50,8 +50,8 @@
 
 <script setup>
 const fontStore = useFont(),
-  redactorStore = useRedactor(),
-  textSetting = ref(redactorStore.activeBlock.settings),
+  blockFocusStore = useBlockFocus(),
+  textSetting = ref(blockFocusStore.activeBlock.settings),
   activeFont = computed(() => {
     return fontStore.list.find((font) => font.name === textSetting.value.name);
   }),
