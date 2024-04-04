@@ -1,5 +1,3 @@
-import {EBlockTypes} from './redactor.i.ts'
-
 export const useRedactor = defineStore("redactor", () => {
   const defaultSlide = (): Slide => ({
       settings: { background: "white" },
@@ -24,6 +22,7 @@ export const useRedactor = defineStore("redactor", () => {
         ? style.weight[0]
         : style.weight[0].min;
       const settings = <TextSettings>{
+        position: 0,
         name: fontStore.list[0].name,
         size: defaultSettings.size,
         style: styleName,
@@ -33,7 +32,7 @@ export const useRedactor = defineStore("redactor", () => {
         type: EBlockTypes.TEXT,
         content: "",
         style: { width: 0, height: 0, top: 0, left: 0 },
-        settings,
+        settings: [settings],
       };
       return textBlock;
     },

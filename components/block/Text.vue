@@ -1,15 +1,21 @@
 <template>
   <BlockLayout
-  v-model="model"
-  ref="move"
-  :moveOptions="moveOptions"
-  @toggle-focus="toggleFocus"
-  @focus="focus"
+    v-model="model"
+    ref="move"
+    :moveOptions="moveOptions"
+    @toggle-focus="toggleFocus"
+    @focus="focus"
   >
-    <Editable
+    <!-- <Editable
       v-model="model.content"
       v-model:settings="model.settings"
       :is-editable="model.editable"
+      ref="content"
+      @input="updateMove"
+    /> -->
+    <CanvasText
+      v-model="model.content"
+      v-model:settings="model.settings"
       ref="content"
       @input="updateMove"
     />
@@ -17,7 +23,7 @@
 </template>
 
 <script setup>
-const {changeActiveBlock} = useBlockFocus();
+const { changeActiveBlock } = useBlockFocus();
 
 const model = defineModel({ default: {} }),
   props = defineProps({
@@ -33,10 +39,10 @@ const model = defineModel({ default: {} }),
       type: HTMLElement,
       default: document.body,
     },
-  })
+  });
 
-  const move = ref(null),
-  content = ref(null)
+const move = ref(null),
+  content = ref(null);
 
 function updateMove() {
   move.value.update();
@@ -44,12 +50,13 @@ function updateMove() {
 
 function focus() {
   if (!model.value.focused) {
-    changeActiveBlock(model.value)
+    changeActiveBlock(model.value);
   }
 }
 
 async function toggleFocus() {
   await nextTick();
+  updateMove()
   content.value.el.focus();
 }
 </script>

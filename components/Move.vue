@@ -31,7 +31,7 @@ defineOptions({
 });
 
 const redactorStore = useRedactor(),
- interactOptions = ref({
+  interactOptions = ref({
     target: null,
     draggable: false,
     throttleDrag: 1,
@@ -76,6 +76,19 @@ watch(
   style,
   (value) => {
     model.value = value;
+  },
+  { deep: true }
+);
+
+watch(
+  model,
+  (value) => {
+    style.value = value;
+    moveEl.value.style.width = `${value.width}px`;
+    moveEl.value.style.height = `${value.height}px`;
+    moveEl.value.style.top = `${value.top}px`;
+    moveEl.value.style.left = `${value.left}px`;
+    moveRef.value.updateRect();
   },
   { deep: true }
 );
@@ -174,7 +187,7 @@ defineExpose({
     position: relative;
     z-index: 1;
     height: max-content;
-    width: 100%;
+    width: max-content;
   }
 }
 </style>

@@ -3,18 +3,19 @@ export enum EBlockTypes {
   IMAGE = 'image',
 }
 
-interface SlideSettings {
+export interface SlideSettings {
   background: string;
 }
 
-interface TextSettings {
+export interface TextSettings {
+  position: number,
   name: string;
   size: number;
   style: string;
   weight: number;
 }
 
-interface SlideBlock {
+export interface SlideBlock {
   focused?: boolean,
   editable?: boolean,
   el: HTMLElement | null,
@@ -26,15 +27,15 @@ interface SlideBlock {
   };
 }
 
-interface SlideTextBlock extends SlideBlock {
+export interface SlideTextBlock extends SlideBlock {
   type: EBlockTypes.TEXT;
   content: string;
-  settings: TextSettings;
+  settings: TextSettings[];
   focus(): void,
   blur(): void,
 }
 
-interface SlideImageBlock extends SlideBlock {
+export interface SlideImageBlock extends SlideBlock {
   type: EBlockTypes.IMAGE;
   image: {
     url: string
@@ -44,7 +45,7 @@ interface SlideImageBlock extends SlideBlock {
   blur(): void,
 }
 
-interface Slide {
+export interface Slide {
   settings: SlideSettings;
   blocks: SlideTextBlock[];
   verticalSlides?: Slide[];
