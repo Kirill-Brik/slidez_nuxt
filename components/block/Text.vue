@@ -16,6 +16,7 @@
     <CanvasText
       v-model="model.content"
       v-model:settings="model.settings"
+      v-model:style="model.style"
       ref="content"
       @input="updateMove"
     />
