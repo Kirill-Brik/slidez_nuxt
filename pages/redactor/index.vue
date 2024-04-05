@@ -28,20 +28,23 @@
         Добавить изображение
       </button>
     </div>
-    <div class="redactor__reveal-wrapper" @click.stop="blockFocusStore.clearActiveBlock()">
+    <div
+      class="redactor__reveal-wrapper"
+      @click.stop="blockFocusStore.clearActiveBlock()"
+    >
       <Reveal class="redactor__reveal" v-model="revealState" :slides="list">
-        <section v-for="(slide, indexv) in list" :key="slide">
+        <section v-for="(slide, indexh) in list" :key="slide">
           <SlideRedactor
-            v-model:settings="list[indexv].settings"
-            v-model:blocks="list[indexv].blocks"
+            v-model:settings="list[indexh].settings"
+            v-model:blocks="list[indexh].blocks"
             class="redactor__slide"
             :reveal-el="revealState.el"
           />
           <template v-if="slide.verticalSlides">
             <SlideRedactor
-              v-for="(verticalSlide, indexh) in slide.verticalSlides"
-              v-model:settings="list[indexv].verticalSlides[indexh].settings"
-              v-model:blocks="list[indexv].verticalSlides[indexh].blocks"
+              v-for="(verticalSlide, indexv) in slide.verticalSlides"
+              v-model:settings="list[indexh].verticalSlides[indexv].settings"
+              v-model:blocks="list[indexh].verticalSlides[indexv].blocks"
               class="redactor__slide"
               :reveal-el="revealState.el"
             />
@@ -82,15 +85,10 @@ const redactorStore = useRedactor();
 const blockFocusStore = useBlockFocus();
 
 const { list, activeSlide } = storeToRefs(redactorStore);
-const { activeBlock } = storeToRefs(blockFocusStore );
+const { activeBlock } = storeToRefs(blockFocusStore);
 
-const {
-  addBlock,
-  addVerticalSlide,
-  addSlide,
-  removeSlide,
-  addImageBlock
-} = redactorStore;
+const { addBlock, addVerticalSlide, addSlide, removeSlide, addImageBlock } =
+  redactorStore;
 
 const deleteButtonDisabled = computed(
   () => list.value.length === 1 && !list.value[0]?.verticalSlides?.length
@@ -102,7 +100,9 @@ watch(
   revealState,
   (value) => {
     if (!value.indexv) activeSlide.value = list.value[value.indexh];
-    else activeSlide.value = list.value[value.indexh].verticalSlides[value.indexv - 1];
+    else
+      activeSlide.value =
+        list.value[value.indexh].verticalSlides[value.indexv - 1];
   },
   { deep: true }
 );

@@ -1,23 +1,23 @@
 export enum EBlockTypes {
-  TEXT = "text",
-  IMAGE = 'image',
+  TEXT = "BlockText",
+  IMAGE = "BlockImage",
 }
 
-interface SlideSettings {
+export interface SlideSettings {
   background: string;
 }
 
-interface TextSettings {
+export interface TextSettings {
   name: string;
   size: number;
   style: string;
   weight: number;
 }
 
-interface SlideBlock {
-  focused?: boolean,
-  editable?: boolean,
-  el: HTMLElement | null,
+export interface SlideBlock {
+  focused?: boolean;
+  editable?: boolean;
+  el: HTMLElement | null;
   style: {
     width: number;
     height: number;
@@ -26,26 +26,23 @@ interface SlideBlock {
   };
 }
 
-interface SlideTextBlock extends SlideBlock {
+export interface SlideTextBlock extends SlideBlock {
   type: EBlockTypes.TEXT;
   content: string;
   settings: TextSettings;
-  focus(): void,
-  blur(): void,
+  focus(): void;
+  blur(): void;
 }
 
-interface SlideImageBlock extends SlideBlock {
+export interface SlideImageBlock extends SlideBlock {
   type: EBlockTypes.IMAGE;
   image: {
-    url: string
+    url: string;
   };
-  settings: TextSettings;
-  focus(): void,
-  blur(): void,
 }
 
-interface Slide {
+export interface Slide {
   settings: SlideSettings;
-  blocks: SlideTextBlock[];
+  blocks: (SlideTextBlock | SlideImageBlock)[];
   verticalSlides?: Slide[];
 }
