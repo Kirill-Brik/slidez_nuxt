@@ -19,7 +19,11 @@ const isFocus = ref(false);
 const cursor = ref({
   isShow: true,
   timer: setInterval(() => {}),
-  position: 0,
+  position: {
+    base: 0,
+    line: 0,
+    linePos: 0,
+  },
 });
 const presedList = ref<string[]>([]);
 const emit = defineEmits(["input"]);
@@ -39,6 +43,9 @@ watch(style, () => {
   resizeLayout();
   renderText(model.value);
 });
+watch(cursor.value.position, (value) => {
+  console.log(value)
+})
 
 function focus() {
   isFocus.value = true;
@@ -59,46 +66,43 @@ function keydownHandler(event: KeyboardEvent) {
   const index = presedList.value.indexOf(event.key);
   if (index === -1) presedList.value.push(event.key);
   event.stopPropagation();
-  switch (event.key) {
-    case "Backspace":
-      model.value = model.value.length
-        ? model.value.slice(0, cursor.value.position - 1) +
-          model.value.slice(cursor.value.position, model.value.length)
-        : "";
-      cursor.value.position =
-        cursor.value.position > 0 ? cursor.value.position - 1 : 0;
-      break;
-    case "ArrowLeft":
-      if (ctx.value) {
-        cursor.value.position =
-          cursor.value.position > 0 ? cursor.value.position - 1 : 0;
+  if (ctx.value) {
+    switch (event.key) {
+      case "Backspace":
+        model.value = model.value.length
+          ? model.value.slice(0, cursor.value.position.base - 1) +
+            model.value.slice(cursor.value.position.base, model.value.length)
+          : "";
+        cursor.value.position.base =
+          cursor.value.position.base > 0 ? cursor.value.position.base - 1 : 0;
+        break;
+      case "ArrowLeft":
+        cursor.value.position.base =
+          cursor.value.position.base > 0 ? cursor.value.position.base - 1 : 0;
         renderText(model.value);
         createCursor(true);
-      }
-
-      break;
-    case "ArrowRight":
-      if (ctx.value) {
-        cursor.value.position =
-          cursor.value.position < model.value.length
-            ? cursor.value.position + 1
+        break;
+      case "ArrowRight":
+        cursor.value.position.base =
+          cursor.value.position.base < model.value.length
+            ? cursor.value.position.base + 1
             : model.value.length;
         renderText(model.value);
         createCursor(true);
-      }
-      break;
-    case "Enter":
-      break;
-    case "Shift":
-      break;
-    default:
-      if (event.key.length === 1) {
-        model.value =
-          model.value.slice(0, cursor.value.position) +
-          event.key +
-          model.value.slice(cursor.value.position, model.value.length);
-        cursor.value.position += 1;
-      }
+        break;
+      case "Enter":
+        break;
+      case "Shift":
+        break;
+      default:
+        if (event.key.length === 1) {
+          model.value =
+            model.value.slice(0, cursor.value.position.base) +
+            event.key +
+            model.value.slice(cursor.value.position.base, model.value.length);
+          cursor.value.position.base += 1;
+        }
+    }
   }
 }
 
@@ -118,7 +122,8 @@ function renderText(text: string) {
     const measure = ctx.value.measureText(text);
     lines.value = adjustText(text);
     lines.value.forEach((line, index) => {
-      if (ctx.value) ctx.value.fillText(line, 0, size * (index + 1));
+      if (ctx.value)
+        ctx.value.fillText(line.trimStart(), 0, size * (index + 1));
     });
     emit("input", text);
   }
@@ -134,49 +139,83 @@ function adjustText(text: string) {
   function getLine(text: string) {
     let line = "";
     for (let key of text) {
-      if (checkOverflow(line + key)) line = line + key;
-      else {
+      line = line + key;
+      if (!checkOverflow(line)) {
         const wordArr = line.trim().split(" ");
         if (wordArr.length > 1) {
           wordArr.pop();
-          line = wordArr.join(" ");
-        }
+          line = wordArr.join(" ") + " ";
+        } else line = line.slice(0, -1);
         break;
       }
     }
     return line;
   }
   const lines = [];
-  let length = text.length
+  let length = text.length;
+  if (length === 0) lines.push("");
   if (ctx.value && canvas.value) {
     for (let index = 0; index < length; ) {
       const line = getLine(text.slice(index, text.length));
-      console.log(line)
-      lines.push(line.trim());
+      lines.push(line);
       index += line.length;
-      console.log(lines, index, text.length)
     }
   }
   return lines;
 }
 
+// function normalizeCursorPosition() {
+//   const {line, linePos} = cursor.value.position
+//   if (linePos > lines.value[line].length) {
+//     cursor.value.position.line = line < lines.value.length ? cursor.value.position.line++ : lines.value.length
+//     cursor.value.position.linePos = line < lines.value.length ? 0 : lines.value[line].length
+//   } else if (linePos < 0) {
+//     cursor.value.position.line = line > 0 ? cursor.value.position.line-- : 0
+//     cursor.value.position.linePos = line > 0 ? lines.value[line].length : 0
+//   }
+//   let linesLength  = 0
+//   for (let currentLine = 0; currentLine < line; ) {
+//     linesLength += lines.value[currentLine].length
+//   }
+//   cursor.value.position.base = linePos + linesLength
+// }
+
 function renderCursor(position: number) {
   if (ctx.value && canvas.value) {
-    const measure = ctx.value.measureText(model.value.slice(0, position));
+
+    let line = 0;
+    let linePos = 0;
+    for (let index = 0; index < position; ) {
+      index += lines.value[line].length;
+      if (position > index) {
+        line++;
+      } else {
+        linePos = lines.value[line].length + (position - index);
+      }
+    }
+    cursor.value.position.line = line;
+    cursor.value.position.linePos = linePos;
+    const measure = ctx.value.measureText(lines.value[line].slice(0, linePos));
     const { name, size, weight, style } = settings.value
       ? settings.value[0]
       : { name: "serif", size: 14, weight: 400, style: "normal" };
     ctx.value.fillStyle = "black";
-    ctx.value.fillRect(measure.width, measure.fontBoundingBoxDescent, 1, size);
+    // console.log(linePos, line);
+    ctx.value.fillRect(
+      measure.width,
+      measure.fontBoundingBoxDescent + size * line,
+      1,
+      size
+    );
   }
 }
 
 function createCursor(isShow: boolean) {
   clearInterval(cursor.value.timer);
   cursor.value.isShow = isShow;
-  if (cursor.value.isShow) renderCursor(cursor.value.position);
+  if (cursor.value.isShow) renderCursor(cursor.value.position.base);
   cursor.value.timer = setInterval(() => {
-    if (!cursor.value.isShow) renderCursor(cursor.value.position);
+    if (!cursor.value.isShow) renderCursor(cursor.value.position.base);
     else {
       renderText(model.value);
     }
