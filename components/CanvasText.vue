@@ -43,9 +43,6 @@ watch(style, () => {
   resizeLayout();
   renderText(model.value);
 });
-watch(cursor.value.position, (value) => {
-  console.log(value)
-})
 
 function focus() {
   isFocus.value = true;
@@ -69,25 +66,37 @@ function keydownHandler(event: KeyboardEvent) {
   if (ctx.value) {
     switch (event.key) {
       case "Backspace":
-        model.value = model.value.length
-          ? model.value.slice(0, cursor.value.position.base - 1) +
-            model.value.slice(cursor.value.position.base, model.value.length)
-          : "";
-        cursor.value.position.base =
-          cursor.value.position.base > 0 ? cursor.value.position.base - 1 : 0;
+        if (cursor.value.position.base > 0) {
+          model.value = model.value.length
+            ? model.value.slice(0, cursor.value.position.base - 1) +
+              model.value.slice(cursor.value.position.base, model.value.length)
+            : "";
+          cursor.value.position.base =
+            cursor.value.position.base > 0 ? --cursor.value.position.base : 0;
+        }
         break;
       case "ArrowLeft":
-        cursor.value.position.base =
-          cursor.value.position.base > 0 ? cursor.value.position.base - 1 : 0;
+        --cursor.value.position.linePos;
         renderText(model.value);
+        normalizeCursorPosition();
         createCursor(true);
         break;
       case "ArrowRight":
-        cursor.value.position.base =
-          cursor.value.position.base < model.value.length
-            ? cursor.value.position.base + 1
-            : model.value.length;
+        ++cursor.value.position.linePos;
         renderText(model.value);
+        normalizeCursorPosition();
+        createCursor(true);
+        break;
+      case "ArrowUp":
+        --cursor.value.position.line;
+        renderText(model.value);
+        normalizeCursorPosition();
+        createCursor(true);
+        break;
+      case "ArrowDown":
+        ++cursor.value.position.line;
+        renderText(model.value);
+        normalizeCursorPosition();
         createCursor(true);
         break;
       case "Enter":
@@ -100,7 +109,7 @@ function keydownHandler(event: KeyboardEvent) {
             model.value.slice(0, cursor.value.position.base) +
             event.key +
             model.value.slice(cursor.value.position.base, model.value.length);
-          cursor.value.position.base += 1;
+          ++cursor.value.position.base;
         }
     }
   }
@@ -164,38 +173,55 @@ function adjustText(text: string) {
   return lines;
 }
 
-// function normalizeCursorPosition() {
-//   const {line, linePos} = cursor.value.position
-//   if (linePos > lines.value[line].length) {
-//     cursor.value.position.line = line < lines.value.length ? cursor.value.position.line++ : lines.value.length
-//     cursor.value.position.linePos = line < lines.value.length ? 0 : lines.value[line].length
-//   } else if (linePos < 0) {
-//     cursor.value.position.line = line > 0 ? cursor.value.position.line-- : 0
-//     cursor.value.position.linePos = line > 0 ? lines.value[line].length : 0
-//   }
-//   let linesLength  = 0
-//   for (let currentLine = 0; currentLine < line; ) {
-//     linesLength += lines.value[currentLine].length
-//   }
-//   cursor.value.position.base = linePos + linesLength
-// }
+function normalizeCursorPosition() {
+  const { line, linePos } = cursor.value.position;
+
+  if (line < 0) {
+    cursor.value.position.line = 0;
+  } else if (line > lines.value.length - 1) {
+    cursor.value.position.line = lines.value.length - 1;
+  }
+
+  if (linePos > lines.value[line].length) {
+    cursor.value.position.line =
+      line < lines.value.length - 1
+        ? ++cursor.value.position.line
+        : lines.value.length - 1;
+    cursor.value.position.linePos =
+      line < lines.value.length - 1 ? 0 : lines.value[line].length;
+  } else if (linePos < 0) {
+    cursor.value.position.line = line > 0 ? --cursor.value.position.line : 0;
+    cursor.value.position.linePos = line > 0 ? lines.value[line].length : 0;
+  }
+  let linesLength = 0;
+  for (let currentLine = 0; currentLine < line; ++currentLine) {
+    linesLength += lines.value[currentLine].length;
+  }
+  cursor.value.position.base = cursor.value.position.linePos + linesLength;
+}
+
+function getCursorLinePosition(position: number) {
+  let line = 0;
+  let linePosition = 0;
+  for (let index = 0; index < position; ) {
+    index += lines.value[line].length;
+    if (position > index) {
+      ++line;
+    } else {
+      linePosition = lines.value[line].length + (position - index);
+    }
+  }
+  return { line, linePosition };
+}
 
 function renderCursor(position: number) {
   if (ctx.value && canvas.value) {
-
-    let line = 0;
-    let linePos = 0;
-    for (let index = 0; index < position; ) {
-      index += lines.value[line].length;
-      if (position > index) {
-        line++;
-      } else {
-        linePos = lines.value[line].length + (position - index);
-      }
-    }
+    const { line, linePosition } = getCursorLinePosition(position);
     cursor.value.position.line = line;
-    cursor.value.position.linePos = linePos;
-    const measure = ctx.value.measureText(lines.value[line].slice(0, linePos));
+    cursor.value.position.linePos = linePosition;
+    const measure = ctx.value.measureText(
+      lines.value[line].slice(0, linePosition)
+    );
     const { name, size, weight, style } = settings.value
       ? settings.value[0]
       : { name: "serif", size: 14, weight: 400, style: "normal" };
