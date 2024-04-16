@@ -4,7 +4,6 @@
     ref="move"
     :moveOptions="moveOptions"
     @toggle-focus="toggleFocus"
-    @focus="focus"
     @blur="blur"
   >
     <CanvasText

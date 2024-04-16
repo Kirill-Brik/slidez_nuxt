@@ -53,9 +53,11 @@ const fontStore = useFont(),
   blockFocusStore = useBlockFocus(),
   textSetting = ref(blockFocusStore.activeBlock.settings[0]),
   activeFont = computed(() => {
+    console.log(textSetting.value.name)
     return fontStore.list.find((font) => font.name === textSetting.value.name);
   }),
   activeStyle = computed(() => {
+    console.log(activeFont.value)
     if (activeFont.value.style)
       return activeFont.value.style.find(
         (style) => style.type === textSetting.value.style
@@ -77,13 +79,13 @@ const fontStore = useFont(),
     else return [];
   });
 
-watch(textSetting, (value) => {
-  blockFocusStore.activeBlock.settings = textSetting.value
-}, {deep: true})
+// watch(textSetting, (value) => {
+//   blockFocusStore.activeBlock.settings = textSetting.value
+// }, {deep: true})
 
-watch(blockFocusStore.activeBlock, (value) => {
-  textSetting.value = blockFocusStore.activeBlock.settings
-})
+// watch(blockFocusStore.activeBlock, (value) => {
+//   textSetting.value = blockFocusStore.activeBlock.settings
+// })
 
 onMounted(() => {
   // initDefaultSettings();
