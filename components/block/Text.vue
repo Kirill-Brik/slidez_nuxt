@@ -18,8 +18,6 @@
 </template>
 
 <script setup>
-const { changeActiveBlock } = useBlockFocus();
-
 const model = defineModel({ default: {} }),
   props = defineProps({
     moveOptions: {
@@ -37,12 +35,6 @@ const move = ref(null),
 
 function updateMove() {
   move.value.update();
-}
-
-function focus() {
-  if (!model.value.focused) {
-    changeActiveBlock(model.value);
-  }
 }
 
 async function toggleFocus() {
