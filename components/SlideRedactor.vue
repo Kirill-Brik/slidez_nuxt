@@ -10,7 +10,6 @@
         v-if="block.type === EBlockTypes.TEXT"
         v-model="blocks[index]"
         :move-options="moveOptions"
-        :outside-target="revealEl"
       />
     </template>
   </section>
@@ -21,13 +20,6 @@ import {EBlockTypes} from '@/stores/redactor.i.ts'
 
 const settings = defineModel("settings");
 const blocks = defineModel("blocks");
-
-const props = defineProps({
-  revealEl: {
-    type: HTMLElement,
-    default: document.body,
-  },
-});
 
 const slideEl = ref(null);
 const moveOptions = ref({ dragContainer: slideEl });

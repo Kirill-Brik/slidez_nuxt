@@ -2,13 +2,14 @@
   <canvas
     class="canvas"
     ref="canvas"
+    tabindex="-1"
     @focus="focus"
     @blur="blur"
-    tabindex="0"
   ></canvas>
 </template>
 
 <script setup lang="ts">
+// const focusStore = useBlockFocus();
 const canvas = ref<HTMLCanvasElement | null>(null);
 const ctx = ref<CanvasRenderingContext2D | null>(null);
 const model = defineModel({ default: "" });
@@ -36,6 +37,7 @@ watch(
   settings,
   () => {
     renderText(model.value);
+    canvas.value?.focus();
   },
   { deep: true }
 );
@@ -43,6 +45,21 @@ watch(style, () => {
   resizeLayout();
   renderText(model.value);
 });
+// watch(
+//   () => focusStore.activeBlock,
+//   (value) => {
+//     console.log(value);
+//     if (!value) blur();
+//     if (value && value.editable) focus();
+//   }
+// );
+
+function setEditable() {
+  canvas.value?.setAttribute("tabindex", "0");
+}
+function disableEditable() {
+  canvas.value?.removeAttribute("tabindex");
+}
 
 function focus() {
   isFocus.value = true;
@@ -260,7 +277,7 @@ function resizeLayout() {
   }
 }
 
-defineExpose({ el: canvas });
+defineExpose({ el: canvas, setEditable, disableEditable });
 
 onMounted(async () => {
   await nextTick();

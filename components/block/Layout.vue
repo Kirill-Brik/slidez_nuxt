@@ -6,56 +6,55 @@
     @click="focus"
     ref="move"
   >
-    <slot>
-
-    </slot>
+    <slot> </slot>
   </Move>
 </template>
 
 <script setup lang="ts">
-
 const props = defineProps<{
-  moveOptions: {}
-}>()
+  moveOptions: {};
+}>();
 
-const block = defineModel({default:{}})
-const emits = defineEmits(['toggleFocus'])
+const block = defineModel({ default: {} });
+const emits = defineEmits(["toggleFocus", "focus", "blur"]);
 
-const move = ref(null)
+const move = ref(null);
 
-const {changeActiveBlock, makeEditable} = useBlockFocus();
+const { changeActiveBlock, makeEditable } = useBlockFocus();
+const { activeBlock } = storeToRefs(useBlockFocus());
+watch(activeBlock, (value) => {
+  if (value && value.el === block.value.el) emits("focus");
+  else emits("blur");
+});
 
 const fullMoveOptions = computed(() => {
   return {
     draggable: !block.value.editable && block.value.focused,
     resizable: !block.value.editable && block.value.focused,
-    ...props.moveOptions };
-})
+    ...props.moveOptions,
+  };
+});
 
-function toggleFocus () {
+function toggleFocus() {
   console.log("toggleFocus");
-  makeEditable()
-  emits('toggleFocus')
+  makeEditable();
+  emits("toggleFocus");
 }
 
-
-function focus () {
+function focus() {
   if (!block.value.focused) {
-    changeActiveBlock(block.value)
+    changeActiveBlock(block.value);
   }
 }
-
 
 onMounted(async () => {
   await nextTick();
   block.value.el = move.value.el;
-  focus()
+  focus();
 });
 defineExpose({
-  update: () => move.value.update()
-})
+  update: () => move.value.update(),
+});
 </script>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

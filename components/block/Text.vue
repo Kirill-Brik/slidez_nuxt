@@ -5,14 +5,8 @@
     :moveOptions="moveOptions"
     @toggle-focus="toggleFocus"
     @focus="focus"
+    @blur="blur"
   >
-    <!-- <Editable
-      v-model="model.content"
-      v-model:settings="model.settings"
-      :is-editable="model.editable"
-      ref="content"
-      @input="updateMove"
-    /> -->
     <CanvasText
       v-model="model.content"
       v-model:settings="model.settings"
@@ -36,10 +30,6 @@ const model = defineModel({ default: {} }),
         checkInput: false,
       },
     },
-    outsideTarget: {
-      type: HTMLElement,
-      default: document.body,
-    },
   });
 
 const move = ref(null),
@@ -58,6 +48,11 @@ function focus() {
 async function toggleFocus() {
   await nextTick();
   updateMove()
+  content.value.setEditable()
   content.value.el.focus();
+}
+
+function blur() {
+  content.value.disableEditable()
 }
 </script>
