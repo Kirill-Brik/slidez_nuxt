@@ -15,7 +15,7 @@
         </ClientOnly>
       </ElFormItem>
       <ElFormItem label="Размер">
-        <ElInputNumber v-model.lazy="textSetting.size" :min="1" :max="64" />
+        <ElInputNumber v-model="textSetting.size"  :min="1" :max="64" />
       </ElFormItem>
       <ElFormItem label="Начертание">
         <ElRadioGroup v-if="activeFont" v-model="textSetting.style">

@@ -35,7 +35,9 @@ watch(model, (value) => {
 });
 watch(
   settings,
-  () => {
+  async () => {
+    await nextTick();
+    console.log("changes");
     renderText(model.value);
     canvas.value?.focus();
   },
@@ -68,6 +70,7 @@ function focus() {
   createCursor(true);
 }
 function blur() {
+  console.log("blurs");
   isFocus.value = false;
   canvas.value?.removeEventListener("keydown", keydownHandler);
   canvas.value?.removeEventListener("keyup", keyUpHandler);
@@ -191,7 +194,7 @@ function adjustText(text: string) {
 }
 
 function normalizeCursorPosition() {
-  const { line, linePos } = cursor.value.position;
+  let { line, linePos } = cursor.value.position;
 
   if (line < 0) {
     cursor.value.position.line = 0;
@@ -199,22 +202,32 @@ function normalizeCursorPosition() {
     cursor.value.position.line = lines.value.length - 1;
   }
 
+  line = cursor.value.position.line
+
   if (linePos > lines.value[line].length) {
     cursor.value.position.line =
       line < lines.value.length - 1
         ? ++cursor.value.position.line
         : lines.value.length - 1;
     cursor.value.position.linePos =
-      line < lines.value.length - 1 ? 0 : lines.value[line].length;
+      line < lines.value.length - 1 ? 1 : lines.value[line].length;
   } else if (linePos < 0) {
     cursor.value.position.line = line > 0 ? --cursor.value.position.line : 0;
     cursor.value.position.linePos = line > 0 ? lines.value[line].length : 0;
   }
+
+  linePos = cursor.value.position.linePos
+  line = cursor.value.position.line
   let linesLength = 0;
   for (let currentLine = 0; currentLine < line; ++currentLine) {
     linesLength += lines.value[currentLine].length;
   }
-  cursor.value.position.base = cursor.value.position.linePos + linesLength;
+  cursor.value.position.base = linePos + linesLength;
+  console.log(
+    cursor.value.position.linePos,
+    cursor.value.position.line,
+    cursor.value.position.base
+  );
 }
 
 function getCursorLinePosition(position: number) {
@@ -231,14 +244,10 @@ function getCursorLinePosition(position: number) {
   return { line, linePosition };
 }
 
-function renderCursor(position: number) {
+function renderCursor() {
   if (ctx.value && canvas.value) {
-    const { line, linePosition } = getCursorLinePosition(position);
-    cursor.value.position.line = line;
-    cursor.value.position.linePos = linePosition;
-    const measure = ctx.value.measureText(
-      lines.value[line].slice(0, linePosition)
-    );
+    const { line, linePos } = cursor.value.position;
+    const measure = ctx.value.measureText(lines.value[line].slice(0, linePos));
     const { name, size, weight, style } = settings.value
       ? settings.value[0]
       : { name: "serif", size: 14, weight: 400, style: "normal" };
@@ -254,11 +263,16 @@ function renderCursor(position: number) {
 }
 
 function createCursor(isShow: boolean) {
+  const { line, linePosition } = getCursorLinePosition(
+    cursor.value.position.base
+  );
+  cursor.value.position.line = line;
+  cursor.value.position.linePos = linePosition;
   clearInterval(cursor.value.timer);
   cursor.value.isShow = isShow;
-  if (cursor.value.isShow) renderCursor(cursor.value.position.base);
+  if (cursor.value.isShow) renderCursor();
   cursor.value.timer = setInterval(() => {
-    if (!cursor.value.isShow) renderCursor(cursor.value.position.base);
+    if (!cursor.value.isShow) renderCursor();
     else {
       renderText(model.value);
     }
