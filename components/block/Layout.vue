@@ -4,7 +4,7 @@
     :options="fullMoveOptions"
     :contentEqualToWindow="contentEqualToWindow"
     @dblclick="toggleFocus"
-    @click="focus"
+    @click.stop="focus"
     ref="move"
   >
     <slot> </slot>

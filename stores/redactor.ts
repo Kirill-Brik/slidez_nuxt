@@ -1,5 +1,6 @@
 import { EBlockTypes } from "./redactor.i";
-import type { SlideImageBlock } from "./redactor.i.ts";
+import type { SlideBlock, SlideImageBlock } from "./redactor.i.ts";
+import { uniqueId } from "lodash";
 
 export const useRedactor = defineStore("redactor", () => {
   const defaultSlide = (): Slide => ({
@@ -31,15 +32,17 @@ export const useRedactor = defineStore("redactor", () => {
         weight,
       };
       const textBlock = <SlideTextBlock>{
+        id: uniqueId(),
         type: EBlockTypes.TEXT,
         content: "",
-        style: { width: 0, height: 0, top: 0, left: 0 },
+        style: { width: 150, height: 20, top: 0, left: 0 },
         settings,
       };
       return textBlock;
     },
     defaultImageBlock = (): SlideImageBlock => {
       const imageBlock = <SlideImageBlock>{
+        id: uniqueId(),
         type: EBlockTypes.IMAGE,
         image: {
           url: "",
@@ -99,6 +102,20 @@ export const useRedactor = defineStore("redactor", () => {
       list.value[h].verticalSlides[v - 1].blocks.push(defaultImageBlock());
     }
   }
+
+  function removeBlock(h: number, v: number, id: SlideBlock["id"]) {
+    if (!v) {
+      list.value[h].blocks = list.value[h].blocks.filter(
+        (block) => block.id !== id
+      );
+      return;
+    }
+    if (list.value[h].verticalSlides) {
+      list.value[h].verticalSlides[v - 1].blocks = list.value[h].verticalSlides[
+        v - 1
+      ].blocks.filter((block) => block.id !== id);
+    }
+  }
   return {
     list,
     addSlide,
@@ -108,5 +125,6 @@ export const useRedactor = defineStore("redactor", () => {
     changeActiveSlide,
     addBlock,
     addImageBlock,
+    removeBlock,
   };
 });

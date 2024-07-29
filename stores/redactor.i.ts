@@ -15,6 +15,7 @@ export interface TextSettings {
 }
 
 export interface SlideBlock {
+  id: string;
   focused?: boolean;
   editable?: boolean;
   el: HTMLElement | null;

@@ -1,8 +1,15 @@
 <template>
+  <ModalImageInput
+    v-model:show="state.showModal"
+    @submit="loadImage"
+    @close="clearBlock"
+    url="https://media.tenor.com/t3dLLNaI50oAAAAM/cat-cats.gif"
+  />
   <BlockLayout
     v-if="state.loaded"
     v-model="model"
     ref="move"
+    @toggleFocus="state.showModal = true"
     :moveOptions="moveOptions"
     :contentEqualToWindow="true"
     :keepRatio="true"
@@ -19,9 +26,13 @@
 </template>
 
 <script setup lang="ts">
-const { changeActiveBlock } = useBlockFocus();
+const revealStore = useRevealInstance();
+const { indexh, indexv } = revealStore.reveal.getState();
+
+const redactorStore = useRedactor();
 
 const model = defineModel<{
+    id: SlideImageBlock["id"];
     style: {
       height: number;
       width: number;
@@ -38,26 +49,35 @@ const model = defineModel<{
     },
   });
 
-const move = ref(null),
-  img = ref(null);
+const move = ref<any>(null);
 
 const state = reactive({
-  imageUrl: "https://media.tenor.com/t3dLLNaI50oAAAAM/cat-cats.gif",
+  imageUrl: "",
   loaded: false,
+  showModal: true,
 });
-onMounted(() => {
+
+function clearBlock() {
+  if (!state.loaded) {
+    redactorStore.removeBlock(indexh, indexv, model.value.id);
+  }
+}
+
+function loadImage (url: string) {
+  state.imageUrl = url;
   const img = new Image();
 
-  img.onload = function () {
-    console.log("w: " + img.naturalWidth, "h: " + img.naturalHeight);
+  img.onload = async function () {
     model.value.style.height = img.naturalHeight;
     model.value.style.width = img.naturalWidth;
 
     state.loaded = true;
+    await nextTick()
+    move.value?.update();
   };
 
   img.src = state.imageUrl;
-});
+}
 </script>
 
 <style lang="scss">
