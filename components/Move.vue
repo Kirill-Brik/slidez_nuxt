@@ -6,8 +6,18 @@
       v-bind="$attrs"
       @click="click"
       @dblclick="dblclick"
+      :style="{
+        width: `${model.width}px`,
+        height: `${model.height}px`,
+      }"
     >
-      <div ref="contentEl" class="move__content">
+      <div
+        ref="contentEl"
+        class="move__content"
+        :style="{
+          height: contentEqualToWindow ? '100%' : 'auto',
+        }"
+      >
         <slot></slot>
       </div>
     </div>
@@ -23,30 +33,28 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Moveable from "vue3-moveable";
 
 defineOptions({
   inheritAttrs: false,
 });
 
-const redactorStore = useRedactor(),
- interactOptions = ref({
-    target: null,
-    draggable: false,
-    throttleDrag: 1,
-    startDragRotate: 0,
-    throttleDragRotate: 0,
-    resizable: false,
-    throttleResize: 1,
-    edge: true,
-  }),
-  props = defineProps({
-    options: {
-      type: Object,
-      default: {},
-    },
-  }),
+const interactOptions = ref({
+  target: null,
+  draggable: false,
+  throttleDrag: 1,
+  startDragRotate: 0,
+  throttleDragRotate: 0,
+  resizable: false,
+  throttleResize: 1,
+  edge: true,
+});
+
+const props = defineProps<{
+    options?: {};
+    contentEqualToWindow?: false;
+  }>(),
   fullOptions = computed(() => {
     return { ...interactOptions.value, ...props.options };
   }),
@@ -61,24 +69,7 @@ const redactorStore = useRedactor(),
       height: 0,
     },
   }),
-  style = ref({
-    ...{
-      top: 0,
-      left: 0,
-      width: 0,
-      height: 0,
-    },
-    ...model.value,
-  }),
   emit = defineEmits(["init", "update", "dblclick", "click"]);
-
-watch(
-  style,
-  (value) => {
-    model.value = value;
-  },
-  { deep: true }
-);
 
 function click(event) {
   emit("click", event);
@@ -89,44 +80,46 @@ function dblclick(event) {
 }
 
 function onDrag(event) {
-  event.target.style.top = `${style.value.top + event.dist[1]}px`;
-  event.target.style.left = `${style.value.left + event.dist[0]}px`;
+  event.target.style.top = `${model.value.top + event.dist[1]}px`;
+  event.target.style.left = `${model.value.left + event.dist[0]}px`;
 }
 
 function onDragEnd(event) {
   if (event.lastEvent) {
-    style.value.top += event.lastEvent.dist[1];
-    style.value.left += event.lastEvent.dist[0];
+    model.value.top += event.lastEvent.dist[1];
+    model.value.left += event.lastEvent.dist[0];
   }
 }
 
 function onResize(event) {
   event.target.style.width = `${event.width}px`;
+  model.value.width = event.width;
+
   event.target.style.height = `${event.height}px`;
-  event.target.style.top = `${style.value.top + event.drag.dist[1]}px`;
-  event.target.style.left = `${style.value.left + event.drag.dist[0]}px`;
+  model.value.height = event.height;
+
+  event.target.style.top = `${model.value.top + event.drag.dist[1]}px`;
+  event.target.style.left = `${model.value.left + event.drag.dist[0]}px`;
 }
 
 function onResizeEnd(event) {
   if (event.lastEvent) {
-    style.value.width = event.lastEvent.width;
-    style.value.height = event.lastEvent.height;
-    style.value.top += event.lastEvent.drag.dist[1];
-    style.value.left += event.lastEvent.drag.dist[0];
+    model.value.top += event.lastEvent.drag.dist[1];
+    model.value.left += event.lastEvent.drag.dist[0];
   }
-  ``;
 }
+
 function update() {
   const contentRect = contentEl.value.getBoundingClientRect();
-  if (style.value.width < contentRect.width) {
-    style.value.width = contentRect.width;
+  if (model.value.width < contentRect.width) {
+    model.value.width = contentRect.width;
   }
-  if (style.value.height < contentRect.height) {
+  if (model.value.height < contentRect.height) {
     moveEl.value.style.height = `${contentRect.height}px`;
-    style.value.height = contentRect.height;
+    model.value.height = contentRect.height;
   }
   moveRef.value.updateRect();
-  emit("update", { el: moveEl.value, style: style.value });
+  emit("update", { el: moveEl.value, style: model.value });
 }
 
 onMounted(async () => {
@@ -139,7 +132,7 @@ onMounted(async () => {
 defineExpose({
   update,
   el: moveEl,
-  style: style.value,
+  style: model.value,
   options: fullOptions.value,
 });
 </script>
@@ -173,7 +166,6 @@ defineExpose({
   &__content {
     position: relative;
     z-index: 1;
-    height: max-content;
     width: 100%;
   }
 }

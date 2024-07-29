@@ -1,4 +1,6 @@
-import {EBlockTypes} from './redactor.i.ts'
+import { EBlockTypes } from "./redactor.i";
+import type { SlideBlock, SlideImageBlock } from "./redactor.i.ts";
+import { uniqueId } from "lodash";
 
 export const useRedactor = defineStore("redactor", () => {
   const defaultSlide = (): Slide => ({
@@ -30,16 +32,25 @@ export const useRedactor = defineStore("redactor", () => {
         weight,
       };
       const textBlock = <SlideTextBlock>{
+        id: uniqueId(),
         type: EBlockTypes.TEXT,
         content: "",
-        style: { width: 0, height: 0, top: 0, left: 0 },
+        style: { width: 150, height: 20, top: 0, left: 0 },
         settings,
       };
       return textBlock;
     },
     defaultImageBlock = (): SlideImageBlock => {
-
-    }
+      const imageBlock = <SlideImageBlock>{
+        id: uniqueId(),
+        type: EBlockTypes.IMAGE,
+        image: {
+          url: "",
+        },
+        style: { width: 0, height: 0, top: 0, left: 0 },
+      };
+      return imageBlock;
+    };
 
   const list = ref<Slide[]>([defaultSlide()]),
     activeSlide = ref<Slide>(list.value[0]),
@@ -51,43 +62,58 @@ export const useRedactor = defineStore("redactor", () => {
   function removeSlide(h: number, v: number) {
     if (!list.value[h]?.verticalSlides?.length) {
       list.value.splice(h, 1);
-      return
+      return;
     }
     if (!v) {
-      const nextSlideH = list.value[h].verticalSlides[0]
-      nextSlideH.verticalSlides = list.value[h].verticalSlides.slice(1)
+      const nextSlideH = list.value[h].verticalSlides[0];
+      nextSlideH.verticalSlides = list.value[h].verticalSlides.slice(1);
 
-      list.value[h] = nextSlideH
-      return
+      list.value[h] = nextSlideH;
+      return;
     }
-    list.value[h].verticalSlides.splice(v-1,1)
+    list.value[h].verticalSlides.splice(v - 1, 1);
   }
-  function addVerticalSlide(h:number,v:number) {
+  function addVerticalSlide(h: number, v: number) {
     if (list.value[h]?.verticalSlides?.length) {
-      list.value[h].verticalSlides.splice(v-1, 0, defaultSlide())
-      return
+      list.value[h].verticalSlides.splice(v - 1, 0, defaultSlide());
+      return;
     }
-    list.value[h].verticalSlides = [defaultSlide()]
+    list.value[h].verticalSlides = [defaultSlide()];
   }
   function changeActiveSlide(slide: Slide) {
-    activeSlide.value = slide
+    activeSlide.value = slide;
   }
-  function addBlock(h: number, v:number) {
+  function addBlock(h: number, v: number) {
     if (!v) {
       list.value[h].blocks.push(defaultTextBlock());
-      return
+      return;
     }
     if (list.value[h].verticalSlides) {
-      list.value[h].verticalSlides[v-1].blocks.push(defaultTextBlock())
+      list.value[h].verticalSlides[v - 1].blocks.push(defaultTextBlock());
     }
   }
-  function addImageBlock (h: number, v: number) {
+
+  function addImageBlock(h: number, v: number) {
     if (!v) {
-      list.value[h].blocks.push(defaultTextBlock());
-      return
+      list.value[h].blocks.push(defaultImageBlock());
+      return;
     }
     if (list.value[h].verticalSlides) {
-      list.value[h].verticalSlides[v-1].blocks.push(defaultTextBlock())
+      list.value[h].verticalSlides[v - 1].blocks.push(defaultImageBlock());
+    }
+  }
+
+  function removeBlock(h: number, v: number, id: SlideBlock["id"]) {
+    if (!v) {
+      list.value[h].blocks = list.value[h].blocks.filter(
+        (block) => block.id !== id
+      );
+      return;
+    }
+    if (list.value[h].verticalSlides) {
+      list.value[h].verticalSlides[v - 1].blocks = list.value[h].verticalSlides[
+        v - 1
+      ].blocks.filter((block) => block.id !== id);
     }
   }
   return {
@@ -99,5 +125,6 @@ export const useRedactor = defineStore("redactor", () => {
     changeActiveSlide,
     addBlock,
     addImageBlock,
+    removeBlock,
   };
 });

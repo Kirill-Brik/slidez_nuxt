@@ -2,60 +2,65 @@
   <Move
     v-model="block.style"
     :options="fullMoveOptions"
+    :contentEqualToWindow="contentEqualToWindow"
     @dblclick="toggleFocus"
-    @click="focus"
+    @click.stop="focus"
     ref="move"
   >
-    <slot>
-
-    </slot>
+    <slot> </slot>
   </Move>
 </template>
 
 <script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    moveOptions?: {};
+    contentEqualToWindow?: boolean;
+    keepRatio?: boolean;
+  }>(),
+  {
+    moveOptions: {},
+    contentEqualToWindow: false,
+    keepRatio: false,
+  }
+);
 
-const props = defineProps<{
-  moveOptions: {}
-}>()
+const block = defineModel({ default: {} });
+const emits = defineEmits(["toggleFocus"]);
 
-const block = defineModel({default:{}})
-const emits = defineEmits(['toggleFocus'])
+const move = ref(null);
 
-const move = ref(null)
-
-const {changeActiveBlock, makeEditable} = useBlockFocus();
+const { changeActiveBlock, makeEditable } = useBlockFocus();
 
 const fullMoveOptions = computed(() => {
   return {
+    keepRatio: props.keepRatio,
     draggable: !block.value.editable && block.value.focused,
     resizable: !block.value.editable && block.value.focused,
-    ...props.moveOptions };
-})
+    ...props.moveOptions,
+  };
+});
 
-function toggleFocus () {
+function toggleFocus() {
   console.log("toggleFocus");
-  makeEditable()
-  emits('toggleFocus')
+  makeEditable();
+  emits("toggleFocus");
 }
 
-
-function focus () {
+function focus() {
   if (!block.value.focused) {
-    changeActiveBlock(block.value)
+    changeActiveBlock(block.value);
   }
 }
-
 
 onMounted(async () => {
   await nextTick();
   block.value.el = move.value.el;
-  focus()
+  focus();
 });
 defineExpose({
-  update: () => move.value.update()
-})
+  update: () => move.value.update(),
+});
 </script>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>
