@@ -17,11 +17,14 @@
     "lodash": "^4.17.21",
     "nuxt": "^3.11.1",
     "pinia": "^2.1.7",
+    "pixi.js": "^8.2.6",
     "reveal.js": "^5.0.5",
     "sass": "^1.72.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
-    "vue3-moveable": "^0.28.0"
+    "vue3-moveable": "^0.28.0",
+    "vue3-pixi": "^0.9.3",
+    "vue3-pixi-nuxt": "^0.9.3"
   },
   "devDependencies": {
     "@element-plus/nuxt": "^1.0.8"

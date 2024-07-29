@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   css: ['~/assets/styles/main.scss'],
   modules: [
     '@pinia/nuxt',
-    '@element-plus/nuxt'
+    '@element-plus/nuxt',
+    'vue3-pixi-nuxt'
   ],
 })
