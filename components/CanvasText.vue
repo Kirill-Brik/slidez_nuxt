@@ -2,10 +2,10 @@
   <Application ref="appRef" :width="240" :height="240" background="aquamarine" tabindex="0"
                @focus="createCursor" @blur="removeCursor">
     <Text ref="textRef">
-            <Text ref="symbolsRefList" v-for="(symbol, index) in text.split('')" @render="renderSymbol(index)">
-              {{ symbol }}
-            </Text>
-<!--      {{ text }}-->
+      <Text ref="symbolsRefList" v-for="(symbol, index) in text.split('')" @render="renderSymbol(index)">
+        {{ symbol }}
+      </Text>
+      <!--      {{ text }}-->
       <Graphics v-if="cursor.isShow" @render="renderCursor"/>
     </Text>
   </Application>
