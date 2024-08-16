@@ -18,7 +18,6 @@
 
 <script setup lang="ts">
 import { BlockText, BlockImage } from "#components";
-import { EBlockTypes } from "@/stores/redactor.i.ts";
 
 const EditorBlocks = {
   BlockText,

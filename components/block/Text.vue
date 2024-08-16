@@ -5,13 +5,6 @@
     :moveOptions="moveOptions"
     @toggle-focus="toggleFocus"
   >
-    <Editable
-      v-model="model.content"
-      v-model:settings="model.settings"
-      :is-editable="model.editable"
-      ref="content"
-      @input="updateMove"
-    />
   </BlockLayout>
 </template>
 
